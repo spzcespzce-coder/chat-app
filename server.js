@@ -6,12 +6,12 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    maxHttpBufferSize: 1e7 // Allow up to 10MB for profile picture data
+    maxHttpBufferSize: 1e7 // Up to 10MB for avatar images
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Persistent in-memory account database 
+// Persistent server-side account database
 const dbUsers = {}; 
 let activeServers = ['global-lounge', 'coding-zone', 'chatgpt-bot'];
 const activeUsers = {};
@@ -28,7 +28,7 @@ function moderateText(text) {
 
 async function askActualAI(userPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return "🤖 Connect your GEMINI_API_KEY in Render settings!";
+    if (!apiKey) return "🤖 Connect your GEMINI_API_KEY in Render settings to wake up my AI brain!";
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
@@ -46,16 +46,16 @@ async function askActualAI(userPrompt) {
 io.on('connection', (socket) => {
     socket.on('register-account', (data) => {
         const usernameTrim = data.username.trim();
-        if (!usernameTrim || !data.password) return socket.emit('auth-response', { success: false, message: 'Invalid input.' });
-        if (dbUsers[usernameTrim]) return socket.emit('auth-response', { success: false, message: 'Username taken!' });
+        if (!usernameTrim || !data.password) return socket.emit('auth-response', { success: false, message: 'Invalid input fields.' });
+        if (dbUsers[usernameTrim]) return socket.emit('auth-response', { success: false, message: 'Username is taken!' });
 
         dbUsers[usernameTrim] = {
             password: data.password, 
             color: data.avatarColor,
-            avatarImage: data.avatarImage || null, // Store the uploaded image file data
+            avatarImage: data.avatarImage || null,
             friends: []
         };
-        socket.emit('auth-response', { success: true, message: 'Registration complete! You can now log in.' });
+        socket.emit('auth-response', { success: true, message: 'Account registered! Logging you in...' });
     });
 
     socket.on('login-account', (data) => {
@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
         const userRecord = dbUsers[usernameTrim];
 
         if (!userRecord || userRecord.password !== data.password) {
-            return socket.emit('auth-response', { success: false, message: 'Invalid credentials.' });
+            return socket.emit('auth-response', { success: false, message: 'Invalid username or password.' });
         }
 
         activeUsers[socket.id] = { username: usernameTrim, color: userRecord.color, avatarImage: userRecord.avatarImage };
@@ -147,4 +147,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Talking App Secure System Online on Port ${PORT}`));
+server.listen(PORT, () => console.log(`System Online on Port ${PORT}`));

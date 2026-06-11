@@ -22,83 +22,95 @@
             --accent: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --border: #94a3b8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: background-color 0.2s, border-color 0.2s; }
-        body { background-color: var(--bg-nav); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-main); overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-nav); display: flex; height: 100vh; width: 100vw; color: var(--text-main); overflow: hidden; }
 
-        /* Modernized Login UI */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(9, 9, 14, 0.95); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(9, 9, 14, 0.98); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 100; }
         .login-box { background-color: var(--bg-chat); padding: 40px; border-radius: 20px; width: 90%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
         .auth-tab-btn { flex: 1; padding: 12px; background: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 10px; }
         .auth-tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
         .login-box input[type="text"], .login-box input[type="password"] { width: 100%; padding: 14px; background-color: var(--bg-sidebar); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); margin-bottom: 15px; outline: none; }
-        .login-box label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); }
-        .join-btn { width: 100%; padding: 14px; background-color: var(--accent); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.05rem; margin-top: 10px; }
-        .join-btn:hover { filter: brightness(1.1); }
+        .join-btn { width: 100%; padding: 14px; background-color: var(--accent); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.05rem; }
         .file-upload-btn { display: block; width: 100%; padding: 12px; background: var(--bg-card); border: 1px dashed var(--accent); color: var(--text-main); text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 15px; }
         input[type="file"] { display: none; }
 
-        /* Sleeker App Container */
-        .app-container { display: flex; width: 100%; max-width: 1500px; height: 95vh; background-color: var(--bg-chat); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 1px solid var(--border); }
+        /* Modified: Stretches flush across the entire screen viewport dimensions */
+        .app-container { display: flex; width: 100vw; height: 100vh; background-color: var(--bg-chat); overflow: hidden; }
         
-        .nav-dock { width: 80px; background-color: var(--bg-nav); display: flex; flex-direction: column; align-items: center; padding-top: 25px; gap: 20px; border-right: 1px solid var(--border); }
-        .dock-icon { width: 50px; height: 50px; border-radius: 25px; background-color: var(--bg-sidebar); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.4rem; color: var(--text-muted); transition: 0.3s all; }
+        .nav-dock { width: 80px; background-color: var(--bg-nav); display: flex; flex-direction: column; align-items: center; padding-top: 25px; gap: 20px; border-right: 1px solid var(--border); flex-shrink: 0; }
+        .dock-icon { width: 50px; height: 50px; border-radius: 25px; background-color: var(--bg-sidebar); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.4rem; color: var(--text-muted); }
         .dock-icon.active, .dock-icon:hover { background-color: var(--accent); color: white; border-radius: 16px; }
 
-        .sidebar { width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar { width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 25px 20px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
         .create-server-btn { background: var(--bg-card); border: none; color: var(--text-main); font-size: 1.2rem; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .create-server-btn:hover { background: var(--accent); color: white; }
         
         .list-items { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
         .list-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 10px 0 5px 10px; font-weight: bold; }
         .list-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .list-item.active, .list-item:hover { background-color: var(--bg-card); color: var(--text-main); }
 
-        /* Upgraded Profile Bar with Image Avatars */
         .profile-bar { padding: 20px; background-color: var(--bg-nav); display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
         .profile-info { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: var(--accent); background-size: cover; background-position: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .profile-settings-trigger { background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: var(--accent); background-size: cover; background-position: center; flex-shrink: 0; position: relative; }
+        
+        /* Status badge overlays matching image_498bb1.png */
+        .status-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg-sidebar); }
+        .status-dot.dnd { background-color: #f23f43; }
+        .status-dot.online { background-color: #23a55a; }
+        .status-dot.idle { background-color: #f0b232; }
+
+        .profile-settings-trigger { background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); }
         .profile-settings-trigger:hover { color: var(--accent); }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-chat); position: relative; }
-        .view-panel { display: none; flex-direction: column; height: 100%; width: 100%; }
+        .main-content { flex: 1; display: flex; background-color: var(--bg-chat); position: relative; overflow: hidden; }
+        .view-panel { display: none; height: 100%; width: 100%; }
         .view-panel.active { display: flex; }
 
-        .chat-header { padding: 25px; border-bottom: 1px solid var(--border); font-size: 1.3rem; font-weight: bold; background-color: var(--bg-chat); z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* Fluid Chat Grid Workspace Layout */
+        .chat-feed-column { flex: 1; display: flex; flex-direction: column; height: 100%; border-right: 1px solid var(--border); }
+        .chat-header { padding: 25px; border-bottom: 1px solid var(--border); font-size: 1.3rem; font-weight: bold; background-color: var(--bg-chat); }
         .chat-history { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        .message-row { display: flex; gap: 15px; max-width: 85%; }
-        .message-row.me { align-self: flex-end; flex-direction: row-reverse; }
-        .msg-container { display: flex; flex-direction: column; }
-        .message-row.me .msg-container { align-items: flex-end; }
-        .sender-info { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
-        .message-row.me .sender-info { flex-direction: row-reverse; }
-        .sender-label { font-size: 0.85rem; color: var(--text-main); font-weight: bold; }
-        .msg-time { font-size: 0.7rem; color: var(--text-muted); }
-        .bubble { padding: 14px 18px; border-radius: 18px; font-size: 1rem; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .message-row.them .bubble { background-color: var(--bg-card); color: var(--text-main); border-top-left-radius: 4px; }
-        .message-row.me .bubble { background-color: var(--accent); color: white; border-top-right-radius: 4px; }
+        
+        /* Modified: Forces ALL messages and sender details perfectly flush left */
+        .message-row { display: flex; gap: 15px; max-width: 90%; align-self: flex-start; flex-direction: row; }
+        .msg-container { display: flex; flex-direction: column; align-items: flex-start; }
+        .sender-info { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-direction: row; }
+        .sender-label { font-size: 0.95rem; color: var(--text-main); font-weight: bold; }
+        .msg-time { font-size: 0.75rem; color: var(--text-muted); }
+        .bubble { padding: 14px 18px; border-radius: 18px; font-size: 1rem; line-height: 1.5; word-break: break-word; background-color: var(--bg-card); color: var(--text-main); border-top-left-radius: 4px; }
         
         .input-deck { padding: 25px; background-color: var(--bg-chat); border-top: 1px solid var(--border); display: flex; gap: 15px; }
         .input-deck input { flex: 1; padding: 16px 25px; background-color: var(--bg-sidebar); border: 1px solid var(--border); border-radius: 30px; color: var(--text-main); font-size: 1rem; outline: none; }
-        .input-deck input:focus { border-color: var(--accent); }
-        .action-btn { background-color: var(--accent); color: white; border: none; border-radius: 30px; padding: 0 30px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: transform 0.1s; }
-        .action-btn:active { transform: scale(0.95); }
+        .action-btn { background-color: var(--accent); color: white; border: none; border-radius: 30px; padding: 0 30px; font-weight: bold; cursor: pointer; }
 
-        .social-layout, .settings-layout { padding: 50px; display: flex; flex-direction: column; gap: 30px; overflow-y: auto; }
-        .section-card { background-color: var(--bg-sidebar); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .section-card h3 { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.2rem; }
+        /* Integrated Activity & Member Sidebar from image_498bb1.png */
+        .activity-right-sidebar { width: 280px; background-color: #11111a; display: flex; flex-direction: column; padding: 20px 15px; overflow-y: auto; gap: 25px; flex-shrink: 0; }
+        .sidebar-section-heading { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; }
+        .activity-card { display: flex; gap: 12px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .activity-game-art { width: 40px; height: 40px; border-radius: 8px; background-color: #2e2e42; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .activity-details { display: flex; flex-direction: column; gap: 2px; }
+        .activity-user { font-size: 0.9rem; font-weight: bold; color: #ffb703; }
+        .activity-game { font-size: 0.85rem; color: #fff; font-weight: 500; }
+        .activity-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
         
+        .member-list-item { display: flex; align-items: center; gap: 12px; padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; }
+        .member-list-item:hover { background: rgba(255,255,255,0.04); }
+        .member-name-container { display: flex; flex-direction: column; }
+        .member-name { font-size: 0.95rem; font-weight: 500; }
+        .member-status-text { font-size: 0.75rem; color: var(--text-muted); }
+        .role-badge { font-size: 0.65rem; background: var(--accent); color: white; padding: 1px 4px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
+
+        .social-layout, .settings-layout { padding: 50px; display: flex; flex-direction: column; gap: 30px; overflow-y: auto; width: 100%; }
+        .section-card { background-color: var(--bg-sidebar); padding: 30px; border-radius: 16px; border: 1px solid var(--border); }
+        .section-card h3 { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .social-input-group { display: flex; gap: 15px; max-width: 500px; margin-bottom: 20px; }
         .social-input-group input { flex: 1; padding: 14px; background: var(--bg-chat); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); outline: none; }
-        
-        .request-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-chat); border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .request-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-chat); border-radius: 10px; margin-bottom: 10px; }
         .sm-btn { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
         .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        .theme-card { padding: 20px; text-align: center; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; font-weight: bold; background: var(--bg-chat); transition: 0.2s; }
-        .theme-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .theme-card { padding: 20px; text-align: center; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; font-weight: bold; background: var(--bg-chat); }
     </style>
 </head>
 <body>
@@ -119,8 +131,8 @@
                 <label class="file-upload-btn" for="auth-avatar-file" id="upload-label">📁 Choose an Image</label>
                 <input type="file" id="auth-avatar-file" accept="image/*" onchange="previewUpload(this, 'upload-label')">
                 
-                <label>Or choose a fallback color:</label>
-                <input type="color" id="auth-color" value="#6366f1" style="width:100%; height:40px; border:none; border-radius:10px; background:transparent; cursor:pointer;">
+                <label>Fallback Avatar Color:</label>
+                <input type="color" id="auth-color" value="#6366f1" style="width:100%; height:40px; border:none; border-radius:10px; background:transparent; cursor:pointer; margin-bottom: 15px;">
             </div>
 
             <button class="join-btn" id="auth-submit-btn">Continue</button>
@@ -142,10 +154,10 @@
             
             <div class="profile-bar">
                 <div class="profile-info">
-                    <div class="avatar" id="global-profile-avatar"></div>
+                    <div class="avatar" id="global-profile-avatar"><span class="status-dot online"></span></div>
                     <div style="overflow: hidden;">
                         <div id="global-profile-name" style="font-weight:bold; font-size:1.05rem;">User</div>
-                        <span style="font-size:0.8rem; color:#4ade80; display:flex; align-items:center; gap:5px;"><span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;"></span>Online</span>
+                        <span style="font-size:0.8rem; color:#4ade80;">Online</span>
                     </div>
                 </div>
                 <button class="profile-settings-trigger" id="dock-settings-btn" title="Profile Settings">⚙️</button>
@@ -153,12 +165,107 @@
         </div>
 
         <div class="main-content">
+            <!-- DUAL VIEW WRAPPER FOR CHAT & THE SIDEBAR CAPTURED IN image_498bb1.png -->
             <div id="panel-chat-view" class="view-panel active">
-                <div class="chat-header" id="active-chat-title"># global-lounge</div>
-                <div class="chat-history" id="chat-scroller"></div>
-                <div class="input-deck">
-                    <input type="text" id="chat-input-field" placeholder="Message...">
-                    <button class="action-btn" id="chat-send-btn">Send</button>
+                <div class="chat-feed-column">
+                    <div class="chat-header" id="active-chat-title"># global-lounge</div>
+                    <div class="chat-history" id="chat-scroller"></div>
+                    <div class="input-deck">
+                        <input type="text" id="chat-input-field" placeholder="Message...">
+                        <button class="action-btn" id="chat-send-btn">Send</button>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDEBAR REPLICATING IN-GAME STATUS GRAPHICS FROM image_498bb1.png -->
+                <div class="activity-right-sidebar">
+                    <div>
+                        <div class="sidebar-section-heading">Activity — 4 ⚙️</div>
+                        <div class="activity-card">
+                            <div class="activity-game-art">🎮</div>
+                            <div class="activity-details">
+                                <div class="activity-user">Thy Finn...</div>
+                                <div class="activity-game">Roblox</div>
+                                <div class="activity-meta">🎮 2d ago ⚡ 3x Streak</div>
+                            </div>
+                        </div>
+                        <div class="activity-card">
+                            <div class="activity-game-art">🦖</div>
+                            <div class="activity-details">
+                                <div class="activity-user">Thy Finn...</div>
+                                <div class="activity-game">ARK: Survival Ascended</div>
+                                <div class="activity-meta">🎮 2d ago ⚡ 4x Streak</div>
+                            </div>
+                        </div>
+                        <div class="activity-card">
+                            <div class="activity-game-art">🟩</div>
+                            <div class="activity-details">
+                                <div class="activity-user">Wafflers</div>
+                                <div class="activity-game">Minecraft</div>
+                                <div class="activity-meta">🎮 5d ago 🔥 Trending</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="sidebar-section-heading">🔴 Discord Server Owner — 1</div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#fff;"><span class="status-dot dnd"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#f23f43;">Sspzceeee <span class="role-badge">CSMC</span></div>
+                                <div class="member-status-text">yo</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section-heading" style="margin-top:15px;">🔵 Main Owner — 1</div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#3b82f6;"><span class="status-dot dnd"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#3b82f6;">SammichX</div>
+                                <div class="member-status-text">minor-craft is good</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section-heading" style="margin-top:15px;">Bot — 3</div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#22c55e;"><span class="status-dot online"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#22c55e;">Carl-bot <span class="role-badge" style="background:#5865f2;">✓ APP</span></div>
+                                <div class="member-status-text">/help | carl.gg</div>
+                            </div>
+                        </div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#a855f7;"><span class="status-dot online"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#a855f7;">Sapphire <span class="role-badge" style="background:#5865f2;">✓ APP</span></div>
+                                <div class="member-status-text">sapph.xyz</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section-heading" style="margin-top:15px;">⭐ member — 2</div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#eab308;"><span class="status-dot dnd"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#eab308;">IHaveAura/Dan</div>
+                            </div>
+                        </div>
+                        <div class="member-list-item">
+                            <div class="avatar" style="width:34px; height:34px; background:#6366f1;"><span class="status-dot idle"></span></div>
+                            <div class="member-name-container">
+                                <div class="member-name" style="color:#6366f1;">Wafflers <span class="role-badge" style="background:#475569;">⚡DRUM</span></div>
+                                <div class="member-status-text">Drums r cool</div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section-heading" style="margin-top:15px;">Offline — 3</div>
+                        <div class="member-list-item" style="opacity:0.4;">
+                            <div class="avatar" style="width:34px; height:34px; background:#475569;"></div>
+                            <div class="member-name">jdogg</div>
+                        </div>
+                        <div class="member-list-item" style="opacity:0.4;">
+                            <div class="avatar" style="width:34px; height:34px; background:#475569;"></div>
+                            <div class="member-name">U a sped シ <span class="role-badge" style="background:#475569;">🏆 AST</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -205,6 +312,7 @@
     <script>
         const socket = io();
         let currentUser = { username: "", color: "", avatarImage: null };
+        let cachedCredentials = null; 
         let authMode = "login"; 
         let activeScope = "servers"; 
         let activeTarget = "global-lounge"; 
@@ -217,6 +325,26 @@
         const chatScroller = document.getElementById('chat-scroller');
         const inputField = document.getElementById('chat-input-field');
         const directoryContainer = document.getElementById('sidebar-directory-items');
+
+        // Upgrade: Persistent Session Token Loader Check
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('talking_app_session');
+            if (token) {
+                try {
+                    cachedCredentials = JSON.parse(token);
+                    // Automatically execute background registration and authentication pass
+                    authMode = "register";
+                    socket.emit('register-account', { 
+                        username: cachedCredentials.username, 
+                        password: cachedCredentials.password, 
+                        avatarColor: cachedCredentials.color || "#6366f1",
+                        avatarImage: cachedCredentials.avatarImage
+                    });
+                } catch(e) {
+                    localStorage.removeItem('talking_app_session');
+                }
+            }
+        });
 
         function previewUpload(input, labelId) {
             const file = input.files[0];
@@ -247,27 +375,46 @@
             const password = document.getElementById('auth-password').value;
             const avatarColor = document.getElementById('auth-color').value;
 
-            if(!username || !password) return alert("Please fill out all required fields.");
+            if(!username || !password) return alert("Please fill out all fields.");
+
+            cachedCredentials = { username, password, color: avatarColor, avatarImage: uploadedAvatarData };
 
             if(authMode === 'register') {
-                socket.emit('register-account', { username, password, avatarColor, avatarImage: uploadedAvatarData });
+                socket.emit('register-account', cachedCredentials);
             } else {
                 socket.emit('login-account', { username, password });
             }
         });
 
         socket.on('auth-response', (data) => {
-            if(!data.success) return alert(data.message);
+            if(!data.success) {
+                // If persistent registration attempt caught a name conflict, fall straight into validation chain
+                if(authMode === 'register' && cachedCredentials) {
+                    authMode = "login";
+                    socket.emit('login-account', { username: cachedCredentials.username, password: cachedCredentials.password });
+                    return;
+                }
+                alert(data.message);
+                return;
+            }
 
             if(authMode === 'register') {
-                alert(data.message);
-                setAuthMode('login');
+                authMode = 'login';
+                socket.emit('login-account', { username: cachedCredentials.username, password: cachedCredentials.password });
             } else {
                 currentUser.username = data.username;
                 currentUser.color = data.avatarColor;
                 currentUser.avatarImage = data.avatarImage;
                 appServers = data.servers;
                 friendsList = data.friends;
+
+                // Save user metadata token cleanly to prevent refresh logouts
+                localStorage.setItem('talking_app_session', JSON.stringify({
+                    username: currentUser.username,
+                    password: cachedCredentials ? cachedCredentials.password : "",
+                    color: currentUser.color,
+                    avatarImage: currentUser.avatarImage
+                }));
 
                 document.getElementById('global-profile-name').innerText = data.username;
                 applyAvatarStyle(document.getElementById('global-profile-avatar'), currentUser.color, currentUser.avatarImage);
@@ -296,10 +443,7 @@
 
         function switchPanel(panelId) {
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.dock-icon').forEach(p => p.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
-            if(panelId === 'panel-chat-view' && activeScope === 'servers') document.getElementById('dock-servers-btn').classList.add('active');
-            if(panelId === 'panel-social-view' || (panelId === 'panel-chat-view' && activeScope === 'social')) document.getElementById('dock-social-btn').classList.add('active');
         }
 
         document.getElementById('trigger-create-server').addEventListener('click', () => {
@@ -323,7 +467,6 @@
             } else {
                 directoryContainer.innerHTML = `<div class="list-section-title">Private Chats</div>`;
                 list = friendsList.map(f => ({id: `dm-${f}`, label: `💬 ${f}`}));
-                if(list.length === 0) directoryContainer.innerHTML += `<div class="list-item" style="pointer-events:none; opacity:0.5;">No friends yet.</div>`;
             }
 
             list.forEach(item => {
@@ -345,16 +488,18 @@
             document.getElementById('active-chat-title').innerText = activeTarget.startsWith('dm-') ? `DM: ${activeTarget.split('-')[1]}` : `# ${activeTarget}`;
             chatScroller.innerHTML = "";
             let stream = recordsCache[activeTarget];
-            stream.forEach(msg => drawBubbleLayout(msg.text, msg.username, msg.color, msg.avatarImage, msg.side, msg.time));
+            stream.forEach(msg => drawBubbleLayout(msg.text, msg.username, msg.color, msg.avatarImage, msg.time));
             chatScroller.scrollTop = chatScroller.scrollHeight;
         }
 
-        function drawBubbleLayout(text, name, color, avatarImage, side, timeStr) {
+        function drawBubbleLayout(text, name, color, avatarImage, timeStr) {
             const row = document.createElement('div');
-            row.className = `message-row ${side}`;
+            row.className = 'message-row'; // Kept generic so it always processes left-aligned execution flows
             
             const avatarDiv = document.createElement('div');
             avatarDiv.className = 'avatar';
+            avatarDiv.style.width = '40px';
+            avatarDiv.style.height = '40px';
             applyAvatarStyle(avatarDiv, color, avatarImage);
 
             row.innerHTML = `
@@ -378,8 +523,8 @@
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             if(!recordsCache[activeTarget]) recordsCache[activeTarget] = [];
             
-            recordsCache[activeTarget].push({ text, username: currentUser.username, color: currentUser.color, avatarImage: currentUser.avatarImage, side: 'me', time: timeStr });
-            drawBubbleLayout(text, currentUser.username, currentUser.color, currentUser.avatarImage, 'me', timeStr);
+            recordsCache[activeTarget].push({ text, username: currentUser.username, color: currentUser.color, avatarImage: currentUser.avatarImage, time: timeStr });
+            drawBubbleLayout(text, currentUser.username, currentUser.color, currentUser.avatarImage, timeStr);
             inputField.value = '';
 
             socket.emit('chat message', { text, username: currentUser.username, avatarColor: currentUser.color, room: activeTarget });
@@ -404,7 +549,14 @@
             if(data.color) currentUser.color = data.color;
             if(data.avatarImage) currentUser.avatarImage = data.avatarImage;
             applyAvatarStyle(document.getElementById('global-profile-avatar'), currentUser.color, currentUser.avatarImage);
-            alert("Profile updated successfully!");
+            
+            // Re-sync local persistent metadata storage states
+            const saved = JSON.parse(localStorage.getItem('talking_app_session') || '{}');
+            saved.color = currentUser.color;
+            saved.avatarImage = currentUser.avatarImage;
+            localStorage.setItem('talking_app_session', JSON.stringify(saved));
+            
+            alert("Profile updated!");
         });
 
         document.getElementById('send-request-btn').addEventListener('click', () => {
@@ -442,9 +594,9 @@
 
         socket.on('chat message', (data) => {
             if(!recordsCache[data.room]) recordsCache[data.room] = [];
-            recordsCache[data.room].push({ text: data.text, username: data.username, color: data.avatarColor, avatarImage: data.avatarImage, side: 'them', time: data.time });
+            recordsCache[data.room].push({ text: data.text, username: data.username, color: data.avatarColor, avatarImage: data.avatarImage, time: data.time });
             if(activeTarget === data.room) {
-                drawBubbleLayout(data.text, data.username, data.avatarColor, data.avatarImage, 'them', data.time);
+                drawBubbleLayout(data.text, data.username, data.avatarColor, data.avatarImage, data.time);
             }
         });
 
