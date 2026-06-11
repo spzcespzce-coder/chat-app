@@ -6,17 +6,11 @@
     <title>Talking App</title>
     <style>
         :root {
-            --bg-nav: #0b0c14;
-            --bg-sidebar: #13141f;
-            --bg-chat: #1a1b26;
-            --bg-card: #222436;
-            --accent: #6366f1;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #2d3139;
+            --bg-nav: #09090e; --bg-sidebar: #11111a; --bg-chat: #181824; --bg-card: #232336;
+            --accent: #6366f1; --text-main: #f8fafc; --text-muted: #94a3b8; --border: #2e2e42;
         }
         [data-theme="cyberpunk"] {
-            --bg-nav: #020014; --bg-sidebar: #0f0226; --bg-chat: #14052b; --bg-card: #240c47;
+            --bg-nav: #020014; --bg-sidebar: #0a0118; --bg-chat: #110424; --bg-card: #1f0b3e;
             --accent: #00f5ff; --text-main: #00f5ff; --text-muted: #ec38bc; --border: #ec38bc;
         }
         [data-theme="amethyst"] {
@@ -24,96 +18,109 @@
             --accent: #b55fe6; --text-main: #f3e8ff; --text-muted: #a78bfa; --border: #3b2e5c;
         }
         [data-theme="light"] {
-            --bg-nav: #e2e8f0; --bg-sidebar: #f1f5f9; --bg-chat: #ffffff; --bg-card: #f8fafc;
-            --accent: #3b82f6; --text-main: #0f172a; --text-muted: #64748b; --border: #cbd5e1;
+            --bg-nav: #cbd5e1; --bg-sidebar: #e2e8f0; --bg-chat: #f8fafc; --bg-card: #ffffff;
+            --accent: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --border: #94a3b8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: background-color 0.2s, border-color 0.2s; }
         body { background-color: var(--bg-nav); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-main); overflow: hidden; }
 
-        /* Real Login Screen UI Styling */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0f0f12; display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .login-box { background-color: #1a1b23; padding: 35px; border-radius: 16px; width: 90%; max-width: 420px; border: 1px solid #2d3139; }
-        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab-btn { flex: 1; padding: 10px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 6px; }
+        /* Modernized Login UI */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(9, 9, 14, 0.95); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .login-box { background-color: var(--bg-chat); padding: 40px; border-radius: 20px; width: 90%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+        .auth-tab-btn { flex: 1; padding: 12px; background: var(--bg-sidebar); border: 1px solid var(--border); color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 10px; }
         .auth-tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .login-box input[type="text"], .login-box input[type="password"] { width: 100%; padding: 12px; background-color: #0f0f12; border: 1px solid #3f4452; border-radius: 8px; color: #fff; margin-bottom: 15px; outline: none; }
-        .login-box label { display: block; text-align: left; margin-bottom: 5px; font-size: 0.85rem; color: #94a3b8; }
-        .login-box input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 8px; background: transparent; cursor: pointer; margin-bottom: 20px; }
-        .join-btn { width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .login-box input[type="text"], .login-box input[type="password"] { width: 100%; padding: 14px; background-color: var(--bg-sidebar); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); margin-bottom: 15px; outline: none; }
+        .login-box label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); }
+        .join-btn { width: 100%; padding: 14px; background-color: var(--accent); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.05rem; margin-top: 10px; }
+        .join-btn:hover { filter: brightness(1.1); }
+        .file-upload-btn { display: block; width: 100%; padding: 12px; background: var(--bg-card); border: 1px dashed var(--accent); color: var(--text-main); text-align: center; border-radius: 10px; cursor: pointer; margin-bottom: 15px; }
+        input[type="file"] { display: none; }
 
-        .app-container { display: flex; width: 98%; max-width: 1400px; height: 92vh; background-color: var(--bg-chat); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+        /* Sleeker App Container */
+        .app-container { display: flex; width: 100%; max-width: 1500px; height: 95vh; background-color: var(--bg-chat); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 1px solid var(--border); }
         
-        .nav-dock { width: 75px; background-color: var(--bg-nav); display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 15px; border-right: 1px solid var(--border); }
-        .dock-icon { width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-card); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); border: 2px solid transparent; }
-        .dock-icon.active, .dock-icon:hover { border-color: var(--accent); color: var(--accent); border-radius: 15px; }
+        .nav-dock { width: 80px; background-color: var(--bg-nav); display: flex; flex-direction: column; align-items: center; padding-top: 25px; gap: 20px; border-right: 1px solid var(--border); }
+        .dock-icon { width: 50px; height: 50px; border-radius: 25px; background-color: var(--bg-sidebar); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.4rem; color: var(--text-muted); transition: 0.3s all; }
+        .dock-icon.active, .dock-icon:hover { background-color: var(--accent); color: white; border-radius: 16px; }
 
-        .sidebar { width: 250px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; }
-        .create-server-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); font-size: 1.2rem; padding: 2px 8px; border-radius: 6px; cursor: pointer; }
-        .create-server-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .sidebar { width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
+        .create-server-btn { background: var(--bg-card); border: none; color: var(--text-main); font-size: 1.2rem; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .create-server-btn:hover { background: var(--accent); color: white; }
         
-        .list-items { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
-        .list-item { padding: 10px 15px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-weight: 500; }
+        .list-items { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+        .list-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 10px 0 5px 10px; font-weight: bold; }
+        .list-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .list-item.active, .list-item:hover { background-color: var(--bg-card); color: var(--text-main); }
 
-        /* Integrated Profile Settings Section Bar */
-        .profile-bar { padding: 15px; background-color: var(--bg-nav); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .profile-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-        .avatar { width: 38px; height: 38px; border-radius: 50%; background-color: var(--accent); flex-shrink: 0; }
-        .profile-settings-trigger { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 5px; border-radius: 4px; }
-        .profile-settings-trigger:hover { color: var(--accent); background: var(--bg-card); }
+        /* Upgraded Profile Bar with Image Avatars */
+        .profile-bar { padding: 20px; background-color: var(--bg-nav); display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+        .profile-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: var(--accent); background-size: cover; background-position: center; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .profile-settings-trigger { background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+        .profile-settings-trigger:hover { color: var(--accent); }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-chat); }
+        .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-chat); position: relative; }
         .view-panel { display: none; flex-direction: column; height: 100%; width: 100%; }
         .view-panel.active { display: flex; }
 
-        .chat-header { padding: 20px 24px; border-bottom: 1px solid var(--border); font-size: 1.1rem; font-weight: bold; }
-        .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
-        .message-row { display: flex; gap: 12px; max-width: 80%; }
+        .chat-header { padding: 25px; border-bottom: 1px solid var(--border); font-size: 1.3rem; font-weight: bold; background-color: var(--bg-chat); z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .chat-history { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .message-row { display: flex; gap: 15px; max-width: 85%; }
         .message-row.me { align-self: flex-end; flex-direction: row-reverse; }
         .msg-container { display: flex; flex-direction: column; }
         .message-row.me .msg-container { align-items: flex-end; }
-        .sender-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
-        .bubble { padding: 12px 16px; border-radius: 16px; font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+        .sender-info { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+        .message-row.me .sender-info { flex-direction: row-reverse; }
+        .sender-label { font-size: 0.85rem; color: var(--text-main); font-weight: bold; }
+        .msg-time { font-size: 0.7rem; color: var(--text-muted); }
+        .bubble { padding: 14px 18px; border-radius: 18px; font-size: 1rem; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .message-row.them .bubble { background-color: var(--bg-card); color: var(--text-main); border-top-left-radius: 4px; }
-        .message-row.me .bubble { background-color: var(--accent); color: #fff; border-top-right-radius: 4px; }
+        .message-row.me .bubble { background-color: var(--accent); color: white; border-top-right-radius: 4px; }
         
-        .input-deck { padding: 20px; background-color: var(--bg-chat); border-top: 1px solid var(--border); display: flex; gap: 10px; }
-        .input-deck input { flex: 1; padding: 14px 20px; background-color: var(--bg-nav); border: 1px solid var(--border); border-radius: 25px; color: var(--text-main); outline: none; }
-        .action-btn { background-color: var(--accent); color: white; border: none; border-radius: 25px; padding: 0 22px; font-weight: bold; cursor: pointer; }
+        .input-deck { padding: 25px; background-color: var(--bg-chat); border-top: 1px solid var(--border); display: flex; gap: 15px; }
+        .input-deck input { flex: 1; padding: 16px 25px; background-color: var(--bg-sidebar); border: 1px solid var(--border); border-radius: 30px; color: var(--text-main); font-size: 1rem; outline: none; }
+        .input-deck input:focus { border-color: var(--accent); }
+        .action-btn { background-color: var(--accent); color: white; border: none; border-radius: 30px; padding: 0 30px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: transform 0.1s; }
+        .action-btn:active { transform: scale(0.95); }
 
-        .social-layout, .settings-layout { padding: 40px; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
-        .section-card { background-color: var(--bg-card); padding: 24px; border-radius: 12px; border: 1px solid var(--border); }
-        .section-card h3 { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .social-layout, .settings-layout { padding: 50px; display: flex; flex-direction: column; gap: 30px; overflow-y: auto; }
+        .section-card { background-color: var(--bg-sidebar); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .section-card h3 { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-size: 1.2rem; }
         
-        .social-input-group { display: flex; gap: 10px; max-width: 400px; margin-bottom: 15px; }
-        .social-input-group input { flex: 1; padding: 10px; background: var(--bg-nav); border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; }
+        .social-input-group { display: flex; gap: 15px; max-width: 500px; margin-bottom: 20px; }
+        .social-input-group input { flex: 1; padding: 14px; background: var(--bg-chat); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); outline: none; }
         
-        .request-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-nav); border-radius: 6px; margin-bottom: 8px; }
-        .sm-btn { padding: 6px 12px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .request-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-chat); border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .sm-btn { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .theme-card { padding: 15px; text-align: center; border-radius: 8px; border: 2px solid var(--border); cursor: pointer; font-weight: bold; background: var(--bg-nav); }
+        .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .theme-card { padding: 20px; text-align: center; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; font-weight: bold; background: var(--bg-chat); transition: 0.2s; }
+        .theme-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-    <!-- Upgrade: Dual Verification Login Screen Portal -->
     <div id="login-screen">
         <div class="login-box">
             <div class="auth-tabs">
                 <button class="auth-tab-btn active" id="tab-login" onclick="setAuthMode('login')">Sign In</button>
                 <button class="auth-tab-btn" id="tab-register" onclick="setAuthMode('register')">Register</button>
             </div>
-            <h3 id="auth-title" style="margin-bottom: 15px; text-align: center;">Welcome Back</h3>
+            <h2 id="auth-title" style="margin-bottom: 20px; text-align: center;">Welcome Back</h2>
             
-            <input type="text" id="auth-username" placeholder="Enter username..." maxlength="15">
-            <input type="password" id="auth-password" placeholder="Enter secure password...">
+            <input type="text" id="auth-username" placeholder="Username" maxlength="15">
+            <input type="password" id="auth-password" placeholder="Password">
             
             <div id="register-only-fields" style="display: none;">
-                <label for="auth-color">Choose System Identity Color:</label>
-                <input type="color" id="auth-color" value="#6366f1">
+                <label style="margin-top: 10px;">Profile Picture (Optional)</label>
+                <label class="file-upload-btn" for="auth-avatar-file" id="upload-label">📁 Choose an Image</label>
+                <input type="file" id="auth-avatar-file" accept="image/*" onchange="previewUpload(this, 'upload-label')">
+                
+                <label>Or choose a fallback color:</label>
+                <input type="color" id="auth-color" value="#6366f1" style="width:100%; height:40px; border:none; border-radius:10px; background:transparent; cursor:pointer;">
             </div>
 
             <button class="join-btn" id="auth-submit-btn">Continue</button>
@@ -129,18 +136,16 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <span id="sidebar-category-title">Channels</span>
-                <!-- Upgrade: Create Dynamic Server Interface Button -->
                 <button class="create-server-btn" id="trigger-create-server" title="Create New Server">+</button>
             </div>
             <div class="list-items" id="sidebar-directory-items"></div>
             
-            <!-- Upgrade: User Profile Integrated Control Panel -->
             <div class="profile-bar">
                 <div class="profile-info">
                     <div class="avatar" id="global-profile-avatar"></div>
-                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        <div id="global-profile-name" style="font-weight:bold;">User</div>
-                        <span style="font-size:0.75rem; color:#4ade80;">Secure Account</span>
+                    <div style="overflow: hidden;">
+                        <div id="global-profile-name" style="font-weight:bold; font-size:1.05rem;">User</div>
+                        <span style="font-size:0.8rem; color:#4ade80; display:flex; align-items:center; gap:5px;"><span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;"></span>Online</span>
                     </div>
                 </div>
                 <button class="profile-settings-trigger" id="dock-settings-btn" title="Profile Settings">⚙️</button>
@@ -148,17 +153,15 @@
         </div>
 
         <div class="main-content">
-            <!-- CHAT WORKSPACE -->
             <div id="panel-chat-view" class="view-panel active">
                 <div class="chat-header" id="active-chat-title"># global-lounge</div>
                 <div class="chat-history" id="chat-scroller"></div>
                 <div class="input-deck">
-                    <input type="text" id="chat-input-field" placeholder="Type a message...">
+                    <input type="text" id="chat-input-field" placeholder="Message...">
                     <button class="action-btn" id="chat-send-btn">Send</button>
                 </div>
             </div>
 
-            <!-- SOCIAL SYSTEM WORKSPACE -->
             <div id="panel-social-view" class="view-panel">
                 <div class="social-layout">
                     <div class="section-card">
@@ -175,14 +178,13 @@
                 </div>
             </div>
 
-            <!-- PROFILE SETTINGS CONFIGURATION PANEL -->
             <div id="panel-settings-view" class="view-panel">
                 <div class="settings-layout">
                     <div class="section-card">
-                        <h3>Profile Dashboard Settings</h3>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display:block; margin-bottom: 8px; font-weight: bold;">Change Avatar Color Hex:</label>
-                            <input type="color" id="settings-avatar-color" style="width:60px; height:35px; cursor:pointer;" onchange="updateProfileColor(this.value)">
+                        <h3>Update Profile Picture</h3>
+                        <div style="max-width: 400px; margin-top: 15px;">
+                            <label class="file-upload-btn" for="settings-avatar-file" id="settings-upload-label">📁 Upload New Image</label>
+                            <input type="file" id="settings-avatar-file" accept="image/*" onchange="updateProfileImage(this)">
                         </div>
                     </div>
                     <div class="section-card">
@@ -202,10 +204,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let currentUser = { username: "", color: "" };
+        let currentUser = { username: "", color: "", avatarImage: null };
         let authMode = "login"; 
         let activeScope = "servers"; 
         let activeTarget = "global-lounge"; 
+        let uploadedAvatarData = null;
 
         let appServers = [];
         let friendsList = [];
@@ -215,7 +218,16 @@
         const inputField = document.getElementById('chat-input-field');
         const directoryContainer = document.getElementById('sidebar-directory-items');
 
-        // Authentication Tab Switch Engine
+        function previewUpload(input, labelId) {
+            const file = input.files[0];
+            if(file) {
+                document.getElementById(labelId).innerText = `✅ Selected: ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = (e) => { uploadedAvatarData = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function setAuthMode(mode) {
             authMode = mode;
             document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
@@ -225,52 +237,42 @@
                 document.getElementById('register-only-fields').style.display = 'none';
             } else {
                 document.getElementById('tab-register').classList.add('active');
-                document.getElementById('auth-title').innerText = "Create Your Account";
+                document.getElementById('auth-title').innerText = "Create Account";
                 document.getElementById('register-only-fields').style.display = 'block';
             }
         }
 
-        // Authentication Submission Handler
         document.getElementById('auth-submit-btn').addEventListener('click', () => {
             const username = document.getElementById('auth-username').value.trim();
             const password = document.getElementById('auth-password').value;
             const avatarColor = document.getElementById('auth-color').value;
 
-            if(!username || !password) {
-                alert("Please fill out all fields.");
-                return;
-            }
+            if(!username || !password) return alert("Please fill out all required fields.");
 
             if(authMode === 'register') {
-                socket.emit('register-account', { username, password, avatarColor });
+                socket.emit('register-account', { username, password, avatarColor, avatarImage: uploadedAvatarData });
             } else {
                 socket.emit('login-account', { username, password });
             }
         });
 
-        // Catch Authentication Response
         socket.on('auth-response', (data) => {
-            if(!data.success) {
-                alert(data.message);
-                return;
-            }
+            if(!data.success) return alert(data.message);
 
             if(authMode === 'register') {
                 alert(data.message);
                 setAuthMode('login');
             } else {
-                // Initialize Account parameters
                 currentUser.username = data.username;
                 currentUser.color = data.avatarColor;
+                currentUser.avatarImage = data.avatarImage;
                 appServers = data.servers;
                 friendsList = data.friends;
 
                 document.getElementById('global-profile-name').innerText = data.username;
-                document.getElementById('global-profile-avatar').style.backgroundColor = data.avatarColor;
-                document.getElementById('settings-avatar-color').value = data.avatarColor;
+                applyAvatarStyle(document.getElementById('global-profile-avatar'), currentUser.color, currentUser.avatarImage);
                 document.getElementById('login-screen').style.display = 'none';
 
-                // Pre-cache core channels
                 appServers.forEach(srv => { if(!recordsCache[srv]) recordsCache[srv] = []; });
                 friendsList.forEach(fr => { if(!recordsCache[`dm-${fr}`]) recordsCache[`dm-${fr}`] = []; });
 
@@ -279,22 +281,30 @@
             }
         });
 
-        // Navigation Controllers
+        function applyAvatarStyle(element, color, imageBase64) {
+            element.style.backgroundColor = color || '#6366f1';
+            if(imageBase64) {
+                element.style.backgroundImage = `url(${imageBase64})`;
+            } else {
+                element.style.backgroundImage = 'none';
+            }
+        }
+
         document.getElementById('dock-servers-btn').addEventListener('click', () => { activeScope = "servers"; switchPanel('panel-chat-view'); document.getElementById('sidebar-category-title').innerText = "Channels"; renderSidebar(); });
         document.getElementById('dock-social-btn').addEventListener('click', () => { activeScope = "social"; switchPanel('panel-social-view'); document.getElementById('sidebar-category-title').innerText = "Direct Messages"; renderSidebar(); });
         document.getElementById('dock-settings-btn').addEventListener('click', () => { switchPanel('panel-settings-view'); });
 
         function switchPanel(panelId) {
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.dock-icon').forEach(p => p.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
+            if(panelId === 'panel-chat-view' && activeScope === 'servers') document.getElementById('dock-servers-btn').classList.add('active');
+            if(panelId === 'panel-social-view' || (panelId === 'panel-chat-view' && activeScope === 'social')) document.getElementById('dock-social-btn').classList.add('active');
         }
 
-        // Dynamic Server Generation Interface
         document.getElementById('trigger-create-server').addEventListener('click', () => {
-            const name = prompt("Enter new Server / Channel name:");
-            if (name) {
-                socket.emit('create-server', name);
-            }
+            const name = prompt("Enter new Server name:");
+            if (name) socket.emit('create-server', name);
         });
 
         socket.on('server-list-updated', (updatedServers) => {
@@ -306,13 +316,14 @@
         function renderSidebar() {
             directoryContainer.innerHTML = "";
             let list = [];
+            
             if(activeScope === 'servers') {
-                list = appServers.map(srv => ({
-                    id: srv, 
-                    label: srv === 'chatgpt-bot' ? '🤖 ChatGPT AI' : `# ${srv}`
-                }));
+                directoryContainer.innerHTML = `<div class="list-section-title">Public Rooms</div>`;
+                list = appServers.map(srv => ({ id: srv, label: srv === 'chatgpt-bot' ? '🤖 ChatGPT AI' : `# ${srv}` }));
             } else {
+                directoryContainer.innerHTML = `<div class="list-section-title">Private Chats</div>`;
                 list = friendsList.map(f => ({id: `dm-${f}`, label: `💬 ${f}`}));
+                if(list.length === 0) directoryContainer.innerHTML += `<div class="list-item" style="pointer-events:none; opacity:0.5;">No friends yet.</div>`;
             }
 
             list.forEach(item => {
@@ -334,14 +345,28 @@
             document.getElementById('active-chat-title').innerText = activeTarget.startsWith('dm-') ? `DM: ${activeTarget.split('-')[1]}` : `# ${activeTarget}`;
             chatScroller.innerHTML = "";
             let stream = recordsCache[activeTarget];
-            stream.forEach(msg => drawBubbleLayout(msg.text, msg.username, msg.color, msg.side));
+            stream.forEach(msg => drawBubbleLayout(msg.text, msg.username, msg.color, msg.avatarImage, msg.side, msg.time));
             chatScroller.scrollTop = chatScroller.scrollHeight;
         }
 
-        function drawBubbleLayout(text, name, color, side) {
+        function drawBubbleLayout(text, name, color, avatarImage, side, timeStr) {
             const row = document.createElement('div');
             row.className = `message-row ${side}`;
-            row.innerHTML = `<div class="avatar" style="background-color: ${color}"></div><div class="msg-container"><span class="sender-label">${name}</span><div class="bubble">${text}</div></div>`;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'avatar';
+            applyAvatarStyle(avatarDiv, color, avatarImage);
+
+            row.innerHTML = `
+                ${avatarDiv.outerHTML}
+                <div class="msg-container">
+                    <div class="sender-info">
+                        <span class="sender-label">${name}</span>
+                        <span class="msg-time">${timeStr || ''}</span>
+                    </div>
+                    <div class="bubble">${text}</div>
+                </div>
+            `;
             chatScroller.appendChild(row);
             chatScroller.scrollTop = chatScroller.scrollHeight;
         }
@@ -350,9 +375,11 @@
             const text = inputField.value.trim();
             if(!text) return;
 
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             if(!recordsCache[activeTarget]) recordsCache[activeTarget] = [];
-            recordsCache[activeTarget].push({ text, username: currentUser.username, color: currentUser.color, side: 'me' });
-            drawBubbleLayout(text, currentUser.username, currentUser.color, 'me');
+            
+            recordsCache[activeTarget].push({ text, username: currentUser.username, color: currentUser.color, avatarImage: currentUser.avatarImage, side: 'me', time: timeStr });
+            drawBubbleLayout(text, currentUser.username, currentUser.color, currentUser.avatarImage, 'me', timeStr);
             inputField.value = '';
 
             socket.emit('chat message', { text, username: currentUser.username, avatarColor: currentUser.color, room: activeTarget });
@@ -361,16 +388,25 @@
         document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
         inputField.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 
-        // Account Profile Color Modification
-        function updateProfileColor(colorValue) {
-            socket.emit('update-profile-settings', { color: colorValue });
+        function updateProfileImage(input) {
+            const file = input.files[0];
+            if(file) {
+                document.getElementById('settings-upload-label').innerText = `✅ Selected: ${file.name}`;
+                const reader = new FileReader();
+                reader.onload = (e) => { 
+                    socket.emit('update-profile-settings', { avatarImage: e.target.result });
+                };
+                reader.readAsDataURL(file);
+            }
         }
+
         socket.on('profile-settings-updated', (data) => {
-            currentUser.color = data.color;
-            document.getElementById('global-profile-avatar').style.backgroundColor = data.color;
+            if(data.color) currentUser.color = data.color;
+            if(data.avatarImage) currentUser.avatarImage = data.avatarImage;
+            applyAvatarStyle(document.getElementById('global-profile-avatar'), currentUser.color, currentUser.avatarImage);
+            alert("Profile updated successfully!");
         });
 
-        // Friends Mechanics
         document.getElementById('send-request-btn').addEventListener('click', () => {
             const target = document.getElementById('friend-target-input').value.trim();
             if(target && target !== currentUser.username) {
@@ -406,9 +442,9 @@
 
         socket.on('chat message', (data) => {
             if(!recordsCache[data.room]) recordsCache[data.room] = [];
-            recordsCache[data.room].push({ text: data.text, username: data.username, color: data.avatarColor, side: 'them' });
+            recordsCache[data.room].push({ text: data.text, username: data.username, color: data.avatarColor, avatarImage: data.avatarImage, side: 'them', time: data.time });
             if(activeTarget === data.room) {
-                drawBubbleLayout(data.text, data.username, data.avatarColor, 'them');
+                drawBubbleLayout(data.text, data.username, data.avatarColor, data.avatarImage, 'them', data.time);
             }
         });
 
