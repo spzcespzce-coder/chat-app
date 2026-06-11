@@ -31,11 +31,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-nav); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-main); overflow: hidden; }
 
+        /* Real Login Screen UI Styling */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0f0f12; display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .login-box { background-color: #1a1b23; padding: 40px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #2d3139; }
-        .login-box input[type="text"] { width: 100%; padding: 12px; background-color: #0f0f12; border: 1px solid #3f4452; border-radius: 8px; color: #fff; margin-bottom: 20px; outline: none; }
-        .login-box input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 8px; background: transparent; cursor: pointer; margin-bottom: 25px; }
-        .join-btn { width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .login-box { background-color: #1a1b23; padding: 35px; border-radius: 16px; width: 90%; max-width: 420px; border: 1px solid #2d3139; }
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-tab-btn { flex: 1; padding: 10px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 6px; }
+        .auth-tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .login-box input[type="text"], .login-box input[type="password"] { width: 100%; padding: 12px; background-color: #0f0f12; border: 1px solid #3f4452; border-radius: 8px; color: #fff; margin-bottom: 15px; outline: none; }
+        .login-box label { display: block; text-align: left; margin-bottom: 5px; font-size: 0.85rem; color: #94a3b8; }
+        .login-box input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 8px; background: transparent; cursor: pointer; margin-bottom: 20px; }
+        .join-btn { width: 100%; padding: 12px; background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
 
         .app-container { display: flex; width: 98%; max-width: 1400px; height: 92vh; background-color: var(--bg-chat); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
         
@@ -43,14 +48,21 @@
         .dock-icon { width: 50px; height: 50px; border-radius: 50%; background-color: var(--bg-card); display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.2rem; color: var(--text-muted); border: 2px solid transparent; }
         .dock-icon.active, .dock-icon:hover { border-color: var(--accent); color: var(--accent); border-radius: 15px; }
 
-        .sidebar { width: 240px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 1.1rem; }
+        .sidebar { width: 250px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; }
+        .create-server-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); font-size: 1.2rem; padding: 2px 8px; border-radius: 6px; cursor: pointer; }
+        .create-server-btn:hover { border-color: var(--accent); color: var(--accent); }
+        
         .list-items { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
         .list-item { padding: 10px 15px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-weight: 500; }
         .list-item.active, .list-item:hover { background-color: var(--bg-card); color: var(--text-main); }
 
-        .profile-bar { padding: 15px; background-color: var(--bg-nav); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        /* Integrated Profile Settings Section Bar */
+        .profile-bar { padding: 15px; background-color: var(--bg-nav); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .profile-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
         .avatar { width: 38px; height: 38px; border-radius: 50%; background-color: var(--accent); flex-shrink: 0; }
+        .profile-settings-trigger { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 5px; border-radius: 4px; }
+        .profile-settings-trigger:hover { color: var(--accent); background: var(--bg-card); }
 
         .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-chat); }
         .view-panel { display: none; flex-direction: column; height: 100%; width: 100%; }
@@ -87,12 +99,24 @@
 </head>
 <body>
 
+    <!-- Upgrade: Dual Verification Login Screen Portal -->
     <div id="login-screen">
         <div class="login-box">
-            <h2>Welcome to Talking App</h2>
-            <input type="text" id="initial-username" placeholder="Pick a username..." maxlength="15">
-            <input type="color" id="initial-color" value="#6366f1">
-            <button class="join-btn" id="enter-app-btn">Enter App</button>
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login" onclick="setAuthMode('login')">Sign In</button>
+                <button class="auth-tab-btn" id="tab-register" onclick="setAuthMode('register')">Register</button>
+            </div>
+            <h3 id="auth-title" style="margin-bottom: 15px; text-align: center;">Welcome Back</h3>
+            
+            <input type="text" id="auth-username" placeholder="Enter username..." maxlength="15">
+            <input type="password" id="auth-password" placeholder="Enter secure password...">
+            
+            <div id="register-only-fields" style="display: none;">
+                <label for="auth-color">Choose System Identity Color:</label>
+                <input type="color" id="auth-color" value="#6366f1">
+            </div>
+
+            <button class="join-btn" id="auth-submit-btn">Continue</button>
         </div>
     </div>
 
@@ -100,19 +124,31 @@
         <div class="nav-dock">
             <div class="dock-icon active" id="dock-servers-btn" title="Chatrooms">🌐</div>
             <div class="dock-icon" id="dock-social-btn" title="Friends System">👥</div>
-            <div class="dock-icon" id="dock-settings-btn" title="Settings">⚙️</div>
         </div>
 
         <div class="sidebar">
-            <div class="sidebar-header" id="sidebar-category-title">Channels</div>
+            <div class="sidebar-header">
+                <span id="sidebar-category-title">Channels</span>
+                <!-- Upgrade: Create Dynamic Server Interface Button -->
+                <button class="create-server-btn" id="trigger-create-server" title="Create New Server">+</button>
+            </div>
             <div class="list-items" id="sidebar-directory-items"></div>
+            
+            <!-- Upgrade: User Profile Integrated Control Panel -->
             <div class="profile-bar">
-                <div class="avatar" id="global-profile-avatar"></div>
-                <div><div id="global-profile-name" style="font-weight:bold;">User</div><span style="font-size:0.75rem; color:#4ade80;">Online</span></div>
+                <div class="profile-info">
+                    <div class="avatar" id="global-profile-avatar"></div>
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <div id="global-profile-name" style="font-weight:bold;">User</div>
+                        <span style="font-size:0.75rem; color:#4ade80;">Secure Account</span>
+                    </div>
+                </div>
+                <button class="profile-settings-trigger" id="dock-settings-btn" title="Profile Settings">⚙️</button>
             </div>
         </div>
 
         <div class="main-content">
+            <!-- CHAT WORKSPACE -->
             <div id="panel-chat-view" class="view-panel active">
                 <div class="chat-header" id="active-chat-title"># global-lounge</div>
                 <div class="chat-history" id="chat-scroller"></div>
@@ -122,6 +158,7 @@
                 </div>
             </div>
 
+            <!-- SOCIAL SYSTEM WORKSPACE -->
             <div id="panel-social-view" class="view-panel">
                 <div class="social-layout">
                     <div class="section-card">
@@ -138,8 +175,16 @@
                 </div>
             </div>
 
+            <!-- PROFILE SETTINGS CONFIGURATION PANEL -->
             <div id="panel-settings-view" class="view-panel">
                 <div class="settings-layout">
+                    <div class="section-card">
+                        <h3>Profile Dashboard Settings</h3>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display:block; margin-bottom: 8px; font-weight: bold;">Change Avatar Color Hex:</label>
+                            <input type="color" id="settings-avatar-color" style="width:60px; height:35px; cursor:pointer;" onchange="updateProfileColor(this.value)">
+                        </div>
+                    </div>
                     <div class="section-card">
                         <h3>Interface Themes</h3>
                         <div class="theme-grid">
@@ -157,28 +202,80 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let currentUser = { username: "Guest", color: "#6366f1" };
+        let currentUser = { username: "", color: "" };
+        let authMode = "login"; 
         let activeScope = "servers"; 
         let activeTarget = "global-lounge"; 
 
-        const recordsCache = { "global-lounge": [], "coding-zone": [], "chatgpt-bot": [] };
-        const friendsList = [];
+        let appServers = [];
+        let friendsList = [];
+        const recordsCache = {};
 
         const chatScroller = document.getElementById('chat-scroller');
         const inputField = document.getElementById('chat-input-field');
         const directoryContainer = document.getElementById('sidebar-directory-items');
 
-        document.getElementById('enter-app-btn').addEventListener('click', () => {
-            const name = document.getElementById('initial-username').value.trim();
-            if(name) {
-                currentUser.username = name;
-                currentUser.color = document.getElementById('initial-color').value;
-                document.getElementById('global-profile-name').innerText = name;
-                document.getElementById('global-profile-avatar').style.backgroundColor = currentUser.color;
+        // Authentication Tab Switch Engine
+        function setAuthMode(mode) {
+            authMode = mode;
+            document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+            if(mode === 'login') {
+                document.getElementById('tab-login').classList.add('active');
+                document.getElementById('auth-title').innerText = "Welcome Back";
+                document.getElementById('register-only-fields').style.display = 'none';
+            } else {
+                document.getElementById('tab-register').classList.add('active');
+                document.getElementById('auth-title').innerText = "Create Your Account";
+                document.getElementById('register-only-fields').style.display = 'block';
+            }
+        }
+
+        // Authentication Submission Handler
+        document.getElementById('auth-submit-btn').addEventListener('click', () => {
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const avatarColor = document.getElementById('auth-color').value;
+
+            if(!username || !password) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            if(authMode === 'register') {
+                socket.emit('register-account', { username, password, avatarColor });
+            } else {
+                socket.emit('login-account', { username, password });
+            }
+        });
+
+        // Catch Authentication Response
+        socket.on('auth-response', (data) => {
+            if(!data.success) {
+                alert(data.message);
+                return;
+            }
+
+            if(authMode === 'register') {
+                alert(data.message);
+                setAuthMode('login');
+            } else {
+                // Initialize Account parameters
+                currentUser.username = data.username;
+                currentUser.color = data.avatarColor;
+                appServers = data.servers;
+                friendsList = data.friends;
+
+                document.getElementById('global-profile-name').innerText = data.username;
+                document.getElementById('global-profile-avatar').style.backgroundColor = data.avatarColor;
+                document.getElementById('settings-avatar-color').value = data.avatarColor;
                 document.getElementById('login-screen').style.display = 'none';
-                
-                socket.emit('register-user', currentUser);
+
+                // Pre-cache core channels
+                appServers.forEach(srv => { if(!recordsCache[srv]) recordsCache[srv] = []; });
+                friendsList.forEach(fr => { if(!recordsCache[`dm-${fr}`]) recordsCache[`dm-${fr}`] = []; });
+
                 renderSidebar();
+                loadChannelFeed();
             }
         });
 
@@ -189,15 +286,31 @@
 
         function switchPanel(panelId) {
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.dock-icon').forEach(i => i.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
         }
+
+        // Dynamic Server Generation Interface
+        document.getElementById('trigger-create-server').addEventListener('click', () => {
+            const name = prompt("Enter new Server / Channel name:");
+            if (name) {
+                socket.emit('create-server', name);
+            }
+        });
+
+        socket.on('server-list-updated', (updatedServers) => {
+            appServers = updatedServers;
+            appServers.forEach(srv => { if(!recordsCache[srv]) recordsCache[srv] = []; });
+            if(activeScope === 'servers') renderSidebar();
+        });
 
         function renderSidebar() {
             directoryContainer.innerHTML = "";
             let list = [];
             if(activeScope === 'servers') {
-                list = [{id:'global-lounge', label:'# global-lounge'}, {id:'coding-zone', label:'# coding-zone'}, {id:'chatgpt-bot', label:'🤖 ChatGPT AI'}];
+                list = appServers.map(srv => ({
+                    id: srv, 
+                    label: srv === 'chatgpt-bot' ? '🤖 ChatGPT AI' : `# ${srv}`
+                }));
             } else {
                 list = friendsList.map(f => ({id: `dm-${f}`, label: `💬 ${f}`}));
             }
@@ -217,9 +330,10 @@
         }
 
         function loadChannelFeed() {
+            if(!recordsCache[activeTarget]) recordsCache[activeTarget] = [];
             document.getElementById('active-chat-title').innerText = activeTarget.startsWith('dm-') ? `DM: ${activeTarget.split('-')[1]}` : `# ${activeTarget}`;
             chatScroller.innerHTML = "";
-            let stream = recordsCache[activeTarget] || [];
+            let stream = recordsCache[activeTarget];
             stream.forEach(msg => drawBubbleLayout(msg.text, msg.username, msg.color, msg.side));
             chatScroller.scrollTop = chatScroller.scrollHeight;
         }
@@ -246,6 +360,15 @@
 
         document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
         inputField.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+        // Account Profile Color Modification
+        function updateProfileColor(colorValue) {
+            socket.emit('update-profile-settings', { color: colorValue });
+        }
+        socket.on('profile-settings-updated', (data) => {
+            currentUser.color = data.color;
+            document.getElementById('global-profile-avatar').style.backgroundColor = data.color;
+        });
 
         // Friends Mechanics
         document.getElementById('send-request-btn').addEventListener('click', () => {
