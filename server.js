@@ -7,16 +7,15 @@ const fs = require('fs');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    maxHttpBufferSize: 1e7 // Up to 10MB for avatar images
+    maxHttpBufferSize: 1e7
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// File system database configuration
+// File database setup
 const DB_FILE = path.join(__dirname, 'users.json');
 let dbUsers = {};
 
-// Load accounts dynamically on startup
 if (fs.existsSync(DB_FILE)) {
     try {
         dbUsers = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
@@ -31,7 +30,7 @@ function saveDatabase() {
 }
 
 let activeServers = ['global-lounge', 'coding-zone', 'chatgpt-bot'];
-const activeUsers = {}; // Tracks socket.id -> { username, color, avatarImage }
+const activeUsers = {}; 
 
 const BANNED_WORDS = ['swear1', 'swear2', 'badword', 'ass', 'bitch', 'fuck']; 
 function moderateText(text) {
@@ -55,12 +54,10 @@ async function askActualAI(userPrompt) {
         const data = await response.json();
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
-        console.error("AI Error:", error);
         return "🤖 Oops! My neural network hit a bump.";
     }
 }
 
-// Broadcasts online list updates to everyone connected
 function broadcastOnlineRoster() {
     const roster = Object.values(activeUsers).map(u => ({
         username: u.username,
@@ -127,10 +124,6 @@ io.on('connection', (socket) => {
                 dbUsers[activeSession.username].color = data.color;
                 activeSession.color = data.color;
             }
-            if (data.avatarImage) {
-                dbUsers[activeSession.username].avatarImage = data.avatarImage;
-                activeSession.avatarImage = data.avatarImage;
-            }
             socket.emit('profile-settings-updated', { color: activeSession.color, avatarImage: activeSession.avatarImage });
             broadcastOnlineRoster();
         }
@@ -153,7 +146,6 @@ io.on('connection', (socket) => {
         };
 
         if (data.room === 'chatgpt-bot') {
-            // Echo user message back to themselves locally first
             socket.emit('chat message', packet);
             const aiResponse = await askActualAI(data.text);
             socket.emit('chat message', {
@@ -162,47 +154,39 @@ io.on('connection', (socket) => {
             });
         } else if (data.room.startsWith('dm-')) {
             const targetName = data.room.split('-')[1];
-            // Send to sender
             socket.emit('chat message', packet);
-            // Locate target user and send to them under their corresponding private room name
             const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === targetName);
             if (targetSocketId) {
                 io.to(targetSocketId).emit('chat message', { ...packet, room: `dm-${activeSession.username}` });
             }
         } else {
-            // Standard channel broadcast
             io.emit('chat message', packet);
         }
     });
 
-    socket.on('send-friend-request', (data) => {
-        const sender = activeUsers[socket.id]?.username;
-        if (!sender || sender === data.targetName) return;
-
-        const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === data.targetName);
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('incoming-friend-request', { from: sender });
-        }
-    });
-
-    socket.on('accept-friend-request', (data) => {
+    // SIMPLIFIED INSTANT FRIEND SYSTEM
+    socket.on('add-friend-instant', (data) => {
         const sender = activeUsers[socket.id]?.username;
         const targetName = data.targetName;
 
-        if (!sender || !dbUsers[sender] || !dbUsers[targetName]) return;
+        if (!sender || !dbUsers[sender] || !dbUsers[targetName] || sender === targetName) return;
 
-        if (!dbUsers[sender].friends.includes(targetName)) dbUsers[sender].friends.push(targetName);
-        if (!dbUsers[targetName].friends.includes(sender)) dbUsers[targetName].friends.push(sender);
+        // Seamlessly add each other to respective lists
+        if (!dbUsers[sender].friends.includes(targetName)) {
+            dbUsers[sender].friends.push(targetName);
+        }
+        if (!dbUsers[targetName].friends.includes(sender)) {
+            dbUsers[targetName].friends.push(sender);
+        }
         
         saveDatabase();
 
-        // Update frontends instantly
+        // Push new friend list values down instantly
         socket.emit('friend-list-updated', dbUsers[sender].friends);
         
         const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === targetName);
         if (targetSocketId) {
             io.to(targetSocketId).emit('friend-list-updated', dbUsers[targetName].friends);
-            io.to(targetSocketId).emit('friend-request-accepted', { from: sender });
         }
     });
 

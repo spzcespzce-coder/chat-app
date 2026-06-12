@@ -20,7 +20,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-main); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
 
-        /* Full Screen Cover Overlay for Authentication Form Layout */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg-main); display: flex; justify-content: center; align-items: center; z-index: 999; }
         .auth-card { background: var(--panel-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 360px; text-align: center; }
         .auth-card h2 { margin-bottom: 24px; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.5px; }
@@ -30,32 +29,26 @@
         .auth-btn:hover { background: var(--primary-hover); }
         #auth-log { color: #ef4444; font-size: 0.85rem; margin-top: 8px; min-height: 18px; }
 
-        /* App Workspace Layout Structure Container */
         .app-container { display: none; width: 95vw; max-width: 1440px; height: 90vh; background-color: var(--panel-bg); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid var(--border); }
 
-        /* Left Side Management Panel Column Layout */
         .left-sidebar { width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-section { display: flex; flex-direction: column; overflow-hidden: hidden; }
+        .sidebar-section { display: flex; flex-direction: column; overflow: hidden; }
         .section-scroll { overflow-y: auto; max-height: 220px; padding: 4px 0; }
         .panel-heading { padding: 16px 20px 8px 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .add-action-icon { cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
         .add-action-icon:hover { color: var(--primary); }
 
-        /* Dynamic Render Rows styling configuration */
         .row-item { display: flex; align-items: center; padding: 10px 20px; cursor: pointer; transition: background 0.2s; position: relative; gap: 12px; font-weight: 500; font-size: 0.95rem; }
         .row-item:hover { background-color: #f3f4f6; }
         .row-item.active { background-color: #e0e7ff; color: var(--primary); font-weight: 600; }
         
-        /* Modularized Image Round Profiles */
         .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background-color: #dbeafe; color: var(--primary); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; background-size: cover; background-position: center; text-transform: uppercase; }
 
-        /* Main Center Message Core Engine UI Window */
         .chat-window { flex: 1; display: flex; flex-direction: column; background-color: var(--panel-bg); }
         .chat-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .chat-header h2 { font-size: 1.15rem; font-weight: 700; }
         .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background-color: #fafafa; }
 
-        /* Dialog Message Clouds layout formatting rules */
         .msg-row { display: flex; flex-direction: column; max-width: 65%; width: fit-content; }
         .msg-row.them { align-self: flex-start; }
         .msg-row.me { align-self: flex-end; align-items: flex-end; }
@@ -64,21 +57,18 @@
         .msg-row.them .msg-cloud { background-color: #e5e7eb; color: var(--text-dark); border-top-left-radius: 4px; }
         .msg-row.me .msg-cloud { background-color: var(--primary); color: #ffffff; border-top-right-radius: 4px; }
 
-        /* Bottom Entry Panel elements configuration */
         .input-area { padding: 16px 24px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; gap: 12px; align-items: center; }
         .input-area input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 24px; outline: none; font-size: 0.95rem; background-color: #f9fafb; transition: 0.2s; }
         .input-area input:focus { border-color: var(--primary); background-color: white; }
         .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 24px; padding: 0 22px; font-weight: 600; height: 42px; cursor: pointer; transition: 0.2s; }
         .send-btn:hover { background-color: var(--primary-hover); }
 
-        /* Profile Banner configurations */
         .profile-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .profile-footer:hover { background-color: #f9fafb; }
         .user-details { display: flex; flex-direction: column; overflow: hidden; }
         .user-name-tag { font-size: 0.9rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         .user-status-text { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* Right Hand Online Status Monitoring Column Panel */
         .right-sidebar { width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .online-scroll { overflow-y: auto; flex: 1; padding: 4px 0; }
         .online-badge-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
@@ -100,21 +90,18 @@
     </div>
 
     <div class="app-container" id="app-workspace">
-        
         <div class="left-sidebar">
             <div class="sidebar-section">
                 <div class="panel-heading">
                     <span>Rooms & channels</span>
                     <span class="add-action-icon" onclick="triggerCreateRoom()">+</span>
                 </div>
-                <div class="section-scroll" id="dom-channel-box">
-                    </div>
+                <div class="section-scroll" id="dom-channel-box"></div>
             </div>
 
             <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; margin-top: 10px;">
                 <div class="panel-heading">Direct Messages</div>
-                <div class="section-scroll" style="flex: 1; max-height: none;" id="dom-friends-box">
-                    </div>
+                <div class="section-scroll" style="flex: 1; max-height: none;" id="dom-friends-box"></div>
             </div>
 
             <div class="profile-footer" onclick="triggerProfileCustomization()">
@@ -129,11 +116,10 @@
         <div class="chat-window">
             <div class="chat-header">
                 <h2 id="dom-active-room-label">Global Lounge</h2>
-                <div style="font-size: 0.85rem; color: var(--text-muted);" id="dom-header-context-meta">Channel Mode</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="dom-header-context-meta">Channel Feed</div>
             </div>
 
-            <div class="chat-history" id="dom-chat-stream">
-                </div>
+            <div class="chat-history" id="dom-chat-stream"></div>
 
             <div class="input-area">
                 <input type="text" id="dom-msg-field" placeholder="Write a broadcast message..." autocomplete="off">
@@ -143,10 +129,8 @@
 
         <div class="right-sidebar">
             <div class="panel-heading">Active Roster</div>
-            <div class="online-scroll" id="dom-online-box">
-                </div>
+            <div class="online-scroll" id="dom-online-box"></div>
         </div>
-
     </div>
 
     <script>
@@ -159,7 +143,6 @@
         let clientFriendsCollection = [];
         let activeSelectedTargetRoom = "global-lounge";
 
-        // --- AUTH ENGINE MANAGEMENT handlers ---
         function submitLogin() {
             const u = document.getElementById('auth-user').value.trim();
             const p = document.getElementById('auth-pass').value;
@@ -185,7 +168,6 @@
                 clientRoomsList = res.servers || ['global-lounge', 'coding-zone', 'chatgpt-bot'];
                 clientFriendsCollection = res.friends || [];
 
-                // Swap authentication display overlay interface visibility bounds state properties
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('app-workspace').style.display = 'flex';
 
@@ -202,17 +184,15 @@
             const myAv = document.getElementById('my-footer-avatar');
             myAv.innerText = clientUser.charAt(0);
             myAv.style.backgroundColor = clientColor;
-            if(clientImage) myAv.style.backgroundImage = `url(${clientImage})`;
         }
 
-        // --- ROOM MANAGEMENT CHANNEL TRANSITIONS ENGINE ---
         function changeTargetRoomState(roomIdentity, isDirectMessage = false) {
             activeSelectedTargetRoom = roomIdentity;
             document.getElementById('dom-active-room-label').innerText = isDirectMessage ? `@${roomIdentity}` : `#${roomIdentity}`;
             document.getElementById('dom-header-context-meta').innerText = isDirectMessage ? "Direct Message Feed" : "Channel Feed";
             document.getElementById('dom-msg-field').placeholder = isDirectMessage ? `Message @${roomIdentity}...` : `Message #${roomIdentity}...`;
             
-            document.getElementById('dom-chat-stream').innerHTML = ''; // Wipe panel clean on layout room context shift
+            document.getElementById('dom-chat-stream').innerHTML = '';
             
             refreshChannelLayoutBox();
             refreshFriendsLayoutBox();
@@ -241,28 +221,23 @@
             });
         }
 
-        // --- FRIEND SYSTEM MANAGEMENT INTERACTION PACKETS ---
-        socket.on('incoming-friend-request', (data) => {
-            if(confirm(`Incoming friend request from @${data.from}! Accept request?`)) {
-                socket.emit('accept-friend-request', { targetName: data.from });
-            }
-        });
-
-        socket.on('friend-request-accepted', (data) => {
-            alert(`@${data.from} accepted your friend request!`);
-        });
+        // SIMPLIFIED INSTANT ADD SCRIPT EXECUTION
+        function addFriendInstant(targetName) {
+            socket.emit('add-friend-instant', { targetName });
+        }
 
         socket.on('friend-list-updated', (updatedFriends) => {
             clientFriendsCollection = updatedFriends;
             refreshFriendsLayoutBox();
-            socket.emit('login-account', { username: clientUser, password: document.getElementById('auth-pass').value }); // Refresh state parameters smoothly
+            // Re-fetch online layout roster states seamlessly
+            socket.emit('login-account', { username: clientUser, password: document.getElementById('auth-pass').value });
         });
 
         function refreshFriendsLayoutBox() {
             const container = document.getElementById('dom-friends-box');
             container.innerHTML = "";
             if(clientFriendsCollection.length === 0) {
-                container.innerHTML = `<div style="padding: 10px 20px; font-size:0.85rem; color:var(--text-muted); font-style:italic;">No friends added yet. Add users via Active Roster.</div>`;
+                container.innerHTML = `<div style="padding: 10px 20px; font-size:0.85rem; color:var(--text-muted); font-style:italic;">No friends yet. Add users via Active Roster.</div>`;
                 return;
             }
             clientFriendsCollection.forEach(frn => {
@@ -276,7 +251,6 @@
             });
         }
 
-        // --- ONLINE REGISTRATION ROSTER RENDERING ACTIONS ---
         socket.on('online-roster-updated', (roster) => {
             const container = document.getElementById('dom-online-box');
             container.innerHTML = "";
@@ -291,11 +265,11 @@
 
                 let actionElement = `<div class="online-badge-dot"></div>`;
                 if(!isSelf && !isAlreadyFriend) {
-                    actionElement = `<button class="action-add-friend" onclick="socket.emit('send-friend-request', {targetName:'${usr.username}'}); alert('Request dispatched!');">+</button>`;
+                    actionElement = `<button class="action-add-friend" onclick="addFriendInstant('${usr.username}')">+</button>`;
                 }
 
                 item.innerHTML = `
-                    <div class="avatar-circle" style="background-color:${usr.color}; ${usr.avatarImage ? `background-image:url(${usr.avatarImage})` : ''}">${usr.username.charAt(0)}</div>
+                    <div class="avatar-circle" style="background-color:${usr.color};">${usr.username.charAt(0)}</div>
                     <div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:120px;">${usr.username} ${isSelf ? '(You)':''}</div>
                     ${actionElement}
                 `;
@@ -303,7 +277,6 @@
             });
         });
 
-        // --- CHAT MESSAGE ENGINE INTERACTION ACTIONS ---
         function executeMessageBroadcast() {
             const field = document.getElementById('dom-msg-field');
             const txt = field.value.trim();
@@ -321,7 +294,6 @@
         document.getElementById('dom-msg-field').addEventListener('keypress', (e) => { if(e.key === 'Enter') executeMessageBroadcast(); });
 
         socket.on('chat message', (data) => {
-            // Drop message frame packet if it doesn't align with active visible panel container configuration mapping
             if(data.room !== activeSelectedTargetRoom) return;
 
             const stream = document.getElementById('dom-chat-stream');
@@ -341,7 +313,6 @@
             stream.scrollTop = stream.scrollHeight;
         });
 
-        // --- PROFILE PREFERENCE SETTINGS CUSTOMIZER ACTIONS ---
         function triggerProfileCustomization() {
             const nextColor = prompt("Enter a hex color for your profile avatar background (e.g. #ff5500):", clientColor);
             if(nextColor) {
