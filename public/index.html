@@ -3,245 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Chat App</title>
+    <title>Modern App Platform</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
+            --bg-main: #f3f4f6;
             --panel-bg: #ffffff;
+            --sidebar-bg: #f9fafb;
             --text-dark: #1f2937;
-            --text-light: #6b7280;
+            --text-muted: #6b7280;
             --border: #e5e7eb;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-main); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
 
-        /* Login Screen */
-        #auth-screen { background: var(--panel-bg); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        #auth-screen h2 { margin-bottom: 20px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.2s; }
+        /* Full Screen Cover Overlay for Authentication Form Layout */
+        #auth-overlay { position: fixed; inset: 0; background: var(--bg-main); display: flex; justify-content: center; align-items: center; z-index: 999; }
+        .auth-card { background: var(--panel-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 360px; text-align: center; }
+        .auth-card h2 { margin-bottom: 24px; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.5px; }
+        .auth-field { width: 100%; padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; }
+        .auth-field:focus { border-color: var(--primary); }
+        .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; transition: 0.2s; }
         .auth-btn:hover { background: var(--primary-hover); }
-        #auth-message { color: #dc2626; font-size: 0.9rem; margin-top: 10px; }
+        #auth-log { color: #ef4444; font-size: 0.85rem; margin-top: 8px; min-height: 18px; }
 
-        /* Main Container */
-        #app-container { display: none; width: 95%; max-width: 1400px; height: 90vh; background-color: var(--panel-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; display: flex; }
+        /* App Workspace Layout Structure Container */
+        .app-container { display: none; width: 95vw; max-width: 1440px; height: 90vh; background-color: var(--panel-bg); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid var(--border); }
 
-        /* Sidebars */
-        .sidebar { width: 280px; background-color: #f9fafb; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar.right { border-right: none; border-left: 1px solid var(--border); width: 260px; }
-        .sidebar-header { padding: 20px; font-weight: 600; border-bottom: 1px solid var(--border); background-color: var(--panel-bg); }
-        .list-container { overflow-y: auto; flex: 1; padding: 10px 0; }
-        .list-item { display: flex; align-items: center; padding: 12px 20px; transition: background 0.2s; }
-        .list-item:hover { background-color: #f3f4f6; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #ccc; margin-right: 15px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem;}
+        /* Left Side Management Panel Column Layout */
+        .left-sidebar { width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-section { display: flex; flex-direction: column; overflow-hidden: hidden; }
+        .section-scroll { overflow-y: auto; max-height: 220px; padding: 4px 0; }
+        .panel-heading { padding: 16px 20px 8px 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .add-action-icon { cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
+        .add-action-icon:hover { color: var(--primary); }
 
-        /* Chat Window */
+        /* Dynamic Render Rows styling configuration */
+        .row-item { display: flex; align-items: center; padding: 10px 20px; cursor: pointer; transition: background 0.2s; position: relative; gap: 12px; font-weight: 500; font-size: 0.95rem; }
+        .row-item:hover { background-color: #f3f4f6; }
+        .row-item.active { background-color: #e0e7ff; color: var(--primary); font-weight: 600; }
+        
+        /* Modularized Image Round Profiles */
+        .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background-color: #dbeafe; color: var(--primary); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; background-size: cover; background-position: center; text-transform: uppercase; }
+
+        /* Main Center Message Core Engine UI Window */
         .chat-window { flex: 1; display: flex; flex-direction: column; background-color: var(--panel-bg); }
-        .chat-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-weight: bold;}
-        .chat-history { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .chat-header h2 { font-size: 1.15rem; font-weight: 700; }
+        .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background-color: #fafafa; }
 
-        /* Messages */
-        .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
-        .message-wrapper.them { align-self: flex-start; }
-        .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
-        .sender-name { font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; margin-left: 4px; margin-right: 4px;}
-        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .message-wrapper.them .bubble { background-color: #f3f4f6; color: var(--text-dark); border-bottom-left-radius: 4px; }
-        .message-wrapper.me .bubble { background-color: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        /* Dialog Message Clouds layout formatting rules */
+        .msg-row { display: flex; flex-direction: column; max-width: 65%; width: fit-content; }
+        .msg-row.them { align-self: flex-start; }
+        .msg-row.me { align-self: flex-end; align-items: flex-end; }
+        .msg-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; display: flex; gap: 6px; }
+        .msg-cloud { padding: 10px 16px; border-radius: 16px; font-size: 0.95rem; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .msg-row.them .msg-cloud { background-color: #e5e7eb; color: var(--text-dark); border-top-left-radius: 4px; }
+        .msg-row.me .msg-cloud { background-color: var(--primary); color: #ffffff; border-top-right-radius: 4px; }
 
-        /* Inputs & Buttons */
-        .input-area { padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 15px; background: var(--panel-bg); }
-        .input-area input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 30px; outline: none; font-size: 1rem; background: #f9fafb; transition: 0.2s;}
-        .input-area input:focus { border-color: var(--primary); background: white;}
-        .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        /* Bottom Entry Panel elements configuration */
+        .input-area { padding: 16px 24px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; gap: 12px; align-items: center; }
+        .input-area input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 24px; outline: none; font-size: 0.95rem; background-color: #f9fafb; transition: 0.2s; }
+        .input-area input:focus { border-color: var(--primary); background-color: white; }
+        .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 24px; padding: 0 22px; font-weight: 600; height: 42px; cursor: pointer; transition: 0.2s; }
         .send-btn:hover { background-color: var(--primary-hover); }
 
-        .add-friend-btn { background: var(--primary); color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: bold; margin-left: auto; transition: 0.2s;}
-        .add-friend-btn:hover { background: var(--primary-hover); }
-        .online-dot { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; margin-left: auto; }
+        /* Profile Banner configurations */
+        .profile-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .profile-footer:hover { background-color: #f9fafb; }
+        .user-details { display: flex; flex-direction: column; overflow: hidden; }
+        .user-name-tag { font-size: 0.9rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+        .user-status-text { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Right Hand Online Status Monitoring Column Panel */
+        .right-sidebar { width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+        .online-scroll { overflow-y: auto; flex: 1; padding: 4px 0; }
+        .online-badge-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+        .action-add-friend { font-size: 0.75rem; background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: auto; transition: 0.2s; }
+        .action-add-friend:hover { background: var(--primary-hover); }
     </style>
 </head>
 <body>
 
-    <!-- Login -->
-    <div id="auth-screen">
-        <h2>Welcome</h2>
-        <input type="text" id="username" class="auth-input" placeholder="Username" autocomplete="off">
-        <input type="password" id="password" class="auth-input" placeholder="Password">
-        <button class="auth-btn" onclick="login()">Login</button>
-        <button class="auth-btn" style="background: #6b7280;" onclick="register()">Register</button>
-        <div id="auth-message"></div>
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>Welcome Back</h2>
+            <input type="text" id="auth-user" class="auth-field" placeholder="Username" autocomplete="off">
+            <input type="password" id="auth-pass" class="auth-field" placeholder="Password">
+            <button class="auth-btn" onclick="submitLogin()">Log In</button>
+            <button class="auth-btn" style="background-color: var(--text-muted);" onclick="submitRegister()">Create Account</button>
+            <div id="auth-log"></div>
+        </div>
     </div>
 
-    <!-- App -->
-    <div id="app-container" style="display: none;">
+    <div class="app-container" id="app-workspace">
         
-        <!-- Left Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">Global Chat</div>
-            <div class="list-container" style="flex: 0; padding-bottom: 0;">
-                <div class="list-item" style="background: #e0e7ff; border-right: 3px solid var(--primary);">
-                    <div class="avatar" style="background-color: var(--primary);">#</div>
-                    <div><strong>Global Lounge</strong></div>
+        <div class="left-sidebar">
+            <div class="sidebar-section">
+                <div class="panel-heading">
+                    <span>Rooms & channels</span>
+                    <span class="add-action-icon" onclick="triggerCreateRoom()">+</span>
+                </div>
+                <div class="section-scroll" id="dom-channel-box">
+                    </div>
+            </div>
+
+            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; margin-top: 10px;">
+                <div class="panel-heading">Direct Messages</div>
+                <div class="section-scroll" style="flex: 1; max-height: none;" id="dom-friends-box">
+                    </div>
+            </div>
+
+            <div class="profile-footer" onclick="triggerProfileCustomization()">
+                <div class="avatar-circle" id="my-footer-avatar">?</div>
+                <div class="user-details">
+                    <span class="user-name-tag" id="my-footer-name">Guest Identity</span>
+                    <span class="user-status-text">Online Profile (Edit)</span>
                 </div>
             </div>
-
-            <div class="sidebar-header" style="border-top: 1px solid var(--border); margin-top: 10px;">Friends List</div>
-            <div class="list-container" id="friend-list">
-                <!-- Friends will populate here -->
-            </div>
         </div>
 
-        <!-- Chat Window -->
         <div class="chat-window">
             <div class="chat-header">
-                <span id="current-room-name">Global Lounge</span>
-                <span id="my-profile-name" style="color: var(--text-light); font-size: 0.9rem;"></span>
+                <h2 id="dom-active-room-label">Global Lounge</h2>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="dom-header-context-meta">Channel Mode</div>
             </div>
-            
-            <div class="chat-history" id="chat-history"></div>
+
+            <div class="chat-history" id="dom-chat-stream">
+                </div>
 
             <div class="input-area">
-                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
-                <button class="send-btn" id="send-btn">Send</button>
+                <input type="text" id="dom-msg-field" placeholder="Write a broadcast message..." autocomplete="off">
+                <button class="send-btn" onclick="executeMessageBroadcast()">Send</button>
             </div>
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="sidebar right">
-            <div class="sidebar-header">Online Users</div>
-            <div class="list-container" id="online-users-list"></div>
+        <div class="right-sidebar">
+            <div class="panel-heading">Active Roster</div>
+            <div class="online-scroll" id="dom-online-box">
+                </div>
         </div>
 
     </div>
 
     <script>
         const socket = io();
-        let myUsername = "";
-        let myFriends = [];
-        let currentOnlineUsers = [];
-
-        // --- AUTH ---
-        const authScreen = document.getElementById('auth-screen');
-        const appContainer = document.getElementById('app-container');
+        let clientUser = "";
+        let clientColor = "#4f46e5";
+        let clientImage = null;
         
-        function login() { socket.emit('login-account', { username: document.getElementById('username').value, password: document.getElementById('password').value }); }
-        function register() {
-            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-            socket.emit('register-account', { username: document.getElementById('username').value, password: document.getElementById('password').value, avatarColor: randomColor });
+        let clientRoomsList = [];
+        let clientFriendsCollection = [];
+        let activeSelectedTargetRoom = "global-lounge";
+
+        // --- AUTH ENGINE MANAGEMENT handlers ---
+        function submitLogin() {
+            const u = document.getElementById('auth-user').value.trim();
+            const p = document.getElementById('auth-pass').value;
+            if(u && p) socket.emit('login-account', { username: u, password: p });
+        }
+
+        function submitRegister() {
+            const u = document.getElementById('auth-user').value.trim();
+            const p = document.getElementById('auth-pass').value;
+            if(!u || !p) return;
+            const ranColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            socket.emit('register-account', { username: u, password: p, avatarColor: ranColor });
         }
 
         socket.on('auth-response', (res) => {
-            if (res.success && res.username) {
-                myUsername = res.username;
-                myFriends = res.friends || [];
+            const logBox = document.getElementById('auth-log');
+            if(res.success) {
+                logBox.innerText = "";
+                clientUser = res.username || document.getElementById('auth-user').value.trim();
+                clientColor = res.avatarColor || clientColor;
+                clientImage = res.avatarImage || null;
                 
-                renderFriendsList();
-                
-                authScreen.style.display = 'none';
-                appContainer.style.display = 'flex';
-                document.getElementById('my-profile-name').innerText = `Logged in as: ${myUsername}`;
+                clientRoomsList = res.servers || ['global-lounge', 'coding-zone', 'chatgpt-bot'];
+                clientFriendsCollection = res.friends || [];
+
+                // Swap authentication display overlay interface visibility bounds state properties
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('app-workspace').style.display = 'flex';
+
+                updateProfileInterfacePlates();
+                refreshChannelLayoutBox();
+                refreshFriendsLayoutBox();
             } else {
-                document.getElementById('auth-message').innerText = res.message;
+                logBox.innerText = res.message;
             }
         });
 
-        // --- CHAT ---
-        const messageInput = document.getElementById('message-input');
-        const chatHistory = document.getElementById('chat-history');
-
-        function sendMessage() {
-            const text = messageInput.value.trim();
-            if (text !== '') {
-                socket.emit('chat message', { text: text });
-                messageInput.value = '';
-            }
+        function updateProfileInterfacePlates() {
+            document.getElementById('my-footer-name').innerText = clientUser;
+            const myAv = document.getElementById('my-footer-avatar');
+            myAv.innerText = clientUser.charAt(0);
+            myAv.style.backgroundColor = clientColor;
+            if(clientImage) myAv.style.backgroundImage = `url(${clientImage})`;
         }
 
-        document.getElementById('send-btn').addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        // --- ROOM MANAGEMENT CHANNEL TRANSITIONS ENGINE ---
+        function changeTargetRoomState(roomIdentity, isDirectMessage = false) {
+            activeSelectedTargetRoom = roomIdentity;
+            document.getElementById('dom-active-room-label').innerText = isDirectMessage ? `@${roomIdentity}` : `#${roomIdentity}`;
+            document.getElementById('dom-header-context-meta').innerText = isDirectMessage ? "Direct Message Feed" : "Channel Feed";
+            document.getElementById('dom-msg-field').placeholder = isDirectMessage ? `Message @${roomIdentity}...` : `Message #${roomIdentity}...`;
+            
+            document.getElementById('dom-chat-stream').innerHTML = ''; // Wipe panel clean on layout room context shift
+            
+            refreshChannelLayoutBox();
+            refreshFriendsLayoutBox();
+        }
 
-        socket.on('chat message', (data) => {
-            const isMe = data.username === myUsername;
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message-wrapper ${isMe ? 'me' : 'them'}`;
-            msgDiv.innerHTML = `
-                ${!isMe ? `<div class="sender-name">${data.username} <span style="font-size:0.7rem;">${data.time}</span></div>` : ''}
-                <div class="bubble">${data.text}</div>
-            `;
-            chatHistory.appendChild(msgDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+        function triggerCreateRoom() {
+            const newName = prompt("Enter new channel name:");
+            if(newName) socket.emit('create-server', newName);
+        }
+
+        socket.on('server-list-updated', (servers) => {
+            clientRoomsList = servers;
+            refreshChannelLayoutBox();
         });
 
-        // --- FRIENDS & ONLINE USERS ---
-        function sendFriendRequest(targetName) {
-            socket.emit('send-friend-request', { targetName });
-            alert(`Friend request sent to ${targetName}!`);
+        function refreshChannelLayoutBox() {
+            const container = document.getElementById('dom-channel-box');
+            container.innerHTML = "";
+            clientRoomsList.forEach(srv => {
+                const isActive = (activeSelectedTargetRoom === srv);
+                const item = document.createElement('div');
+                item.className = `row-item ${isActive ? 'active' : ''}`;
+                item.onclick = () => changeTargetRoomState(srv, false);
+                item.innerHTML = `<div class="avatar-circle" style="background-color:${isActive ? 'var(--primary)':'#e5e7eb'}; color:${isActive?'white':'#4b5563'}">#</div><div>${srv}</div>`;
+                container.appendChild(item);
+            });
         }
 
+        // --- FRIEND SYSTEM MANAGEMENT INTERACTION PACKETS ---
         socket.on('incoming-friend-request', (data) => {
-            if(confirm(`${data.from} sent you a friend request! Do you want to accept?`)) {
+            if(confirm(`Incoming friend request from @${data.from}! Accept request?`)) {
                 socket.emit('accept-friend-request', { targetName: data.from });
             }
         });
 
-        socket.on('friends-list-updated', (friends) => {
-            myFriends = friends;
-            renderFriendsList();
-            renderOnlineUsers(); // Re-render to hide '+' buttons for new friends
+        socket.on('friend-request-accepted', (data) => {
+            alert(`@${data.from} accepted your friend request!`);
         });
 
-        function renderFriendsList() {
-            const friendContainer = document.getElementById('friend-list');
-            friendContainer.innerHTML = '';
-            myFriends.forEach(friend => {
-                const initial = friend.charAt(0).toUpperCase();
-                friendContainer.innerHTML += `
-                    <div class="list-item">
-                        <div class="avatar" style="background-color: #10b981;">${initial}</div>
-                        <div><strong>${friend}</strong></div>
-                    </div>
-                `;
+        socket.on('friend-list-updated', (updatedFriends) => {
+            clientFriendsCollection = updatedFriends;
+            refreshFriendsLayoutBox();
+            socket.emit('login-account', { username: clientUser, password: document.getElementById('auth-pass').value }); // Refresh state parameters smoothly
+        });
+
+        function refreshFriendsLayoutBox() {
+            const container = document.getElementById('dom-friends-box');
+            container.innerHTML = "";
+            if(clientFriendsCollection.length === 0) {
+                container.innerHTML = `<div style="padding: 10px 20px; font-size:0.85rem; color:var(--text-muted); font-style:italic;">No friends added yet. Add users via Active Roster.</div>`;
+                return;
+            }
+            clientFriendsCollection.forEach(frn => {
+                const dmRoomID = `dm-${frn}`;
+                const isActive = (activeSelectedTargetRoom === dmRoomID);
+                const item = document.createElement('div');
+                item.className = `row-item ${isActive ? 'active' : ''}`;
+                item.onclick = () => changeTargetRoomState(dmRoomID, true);
+                item.innerHTML = `<div class="avatar-circle" style="background-color:#10b981; color:white;">${frn.charAt(0)}</div><div>${frn}</div>`;
+                container.appendChild(item);
             });
         }
 
-        socket.on('online-users-list', (users) => {
-            currentOnlineUsers = users;
-            renderOnlineUsers();
-        });
+        // --- ONLINE REGISTRATION ROSTER RENDERING ACTIONS ---
+        socket.on('online-roster-updated', (roster) => {
+            const container = document.getElementById('dom-online-box');
+            container.innerHTML = "";
 
-        function renderOnlineUsers() {
-            const container = document.getElementById('online-users-list');
-            container.innerHTML = ''; 
-            
-            currentOnlineUsers.forEach(user => {
-                const initial = user.username.charAt(0).toUpperCase();
-                const isMe = user.username === myUsername;
-                const isFriend = myFriends.includes(user.username);
-                
-                let actionBtn = '';
-                let onlineDotStyle = '';
-                
-                if (!isMe && !isFriend) {
-                    actionBtn = `<button class="add-friend-btn" onclick="sendFriendRequest('${user.username}')">+ Add</button>`;
-                    onlineDotStyle = 'margin-left: 10px;'; // push dot over if button is there
+            roster.forEach(usr => {
+                const isSelf = (usr.username === clientUser);
+                const isAlreadyFriend = clientFriendsCollection.includes(usr.username);
+
+                const item = document.createElement('div');
+                item.className = 'row-item';
+                item.style.cursor = 'default';
+
+                let actionElement = `<div class="online-badge-dot"></div>`;
+                if(!isSelf && !isAlreadyFriend) {
+                    actionElement = `<button class="action-add-friend" onclick="socket.emit('send-friend-request', {targetName:'${usr.username}'}); alert('Request dispatched!');">+</button>`;
                 }
 
-                const userDiv = document.createElement('div');
-                userDiv.className = 'list-item';
-                userDiv.innerHTML = `
-                    <div class="avatar" style="background-color: ${user.color};">${initial}</div>
-                    <div style="flex: 1;"><strong>${user.username} ${isMe ? '(You)' : ''}</strong></div>
-                    ${actionBtn}
-                    <div class="online-dot" style="${onlineDotStyle}"></div>
+                item.innerHTML = `
+                    <div class="avatar-circle" style="background-color:${usr.color}; ${usr.avatarImage ? `background-image:url(${usr.avatarImage})` : ''}">${usr.username.charAt(0)}</div>
+                    <div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:120px;">${usr.username} ${isSelf ? '(You)':''}</div>
+                    ${actionElement}
                 `;
-                container.appendChild(userDiv);
+                container.appendChild(item);
             });
+        });
+
+        // --- CHAT MESSAGE ENGINE INTERACTION ACTIONS ---
+        function executeMessageBroadcast() {
+            const field = document.getElementById('dom-msg-field');
+            const txt = field.value.trim();
+            if(!txt) return;
+
+            socket.emit('chat message', {
+                text: txt,
+                room: activeSelectedTargetRoom,
+                username: clientUser,
+                avatarColor: clientColor
+            });
+            field.value = "";
         }
+
+        document.getElementById('dom-msg-field').addEventListener('keypress', (e) => { if(e.key === 'Enter') executeMessageBroadcast(); });
+
+        socket.on('chat message', (data) => {
+            // Drop message frame packet if it doesn't align with active visible panel container configuration mapping
+            if(data.room !== activeSelectedTargetRoom) return;
+
+            const stream = document.getElementById('dom-chat-stream');
+            const isMe = (data.username === clientUser);
+
+            const row = document.createElement('div');
+            row.className = `msg-row ${isMe ? 'me' : 'them'}`;
+
+            row.innerHTML = `
+                <div class="msg-meta">
+                    <span style="font-weight:700;">${data.username}</span>
+                    <span>${data.time}</span>
+                </div>
+                <div class="msg-cloud">${data.text}</div>
+            `;
+            stream.appendChild(row);
+            stream.scrollTop = stream.scrollHeight;
+        });
+
+        // --- PROFILE PREFERENCE SETTINGS CUSTOMIZER ACTIONS ---
+        function triggerProfileCustomization() {
+            const nextColor = prompt("Enter a hex color for your profile avatar background (e.g. #ff5500):", clientColor);
+            if(nextColor) {
+                clientColor = nextColor;
+                socket.emit('update-profile-settings', { color: nextColor });
+            }
+        }
+
+        socket.on('profile-settings-updated', (data) => {
+            if(data.color) clientColor = data.color;
+            updateProfileInterfacePlates();
+        });
     </script>
 </body>
 </html>
