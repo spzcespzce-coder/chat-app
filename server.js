@@ -6,18 +6,14 @@ const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    maxHttpBufferSize: 1e7
-});
+const io = new Server(server, { maxHttpBufferSize: 1e7 });
 
-// Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Persistent Database using a JSON file
 const DB_FILE = 'users.json';
 let dbUsers = {};
 
-// Load existing users if the file exists
 if (fs.existsSync(DB_FILE)) {
     try {
         dbUsers = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
@@ -26,16 +22,14 @@ if (fs.existsSync(DB_FILE)) {
     }
 }
 
-// Function to save to database
 function saveDb() {
     fs.writeFileSync(DB_FILE, JSON.stringify(dbUsers, null, 2));
 }
 
-let activeServers = ['global-lounge', 'coding-zone', 'chatgpt-bot'];
-const activeUsers = {}; // Tracks currently online users
+const activeUsers = {}; 
 
-const BANNED_WORDS = ['swear1', 'swear2', 'badword']; 
 function moderateText(text) {
+    const BANNED_WORDS = ['swear1', 'swear2', 'badword']; 
     let moderated = text;
     BANNED_WORDS.forEach(word => {
         const regex = new RegExp(`\\b${word}\\b`, 'gi');
@@ -44,7 +38,6 @@ function moderateText(text) {
     return moderated;
 }
 
-// Broadcasts the current online users to everyone
 function broadcastOnlineUsers() {
     const onlineList = Object.values(activeUsers).map(u => ({ username: u.username, color: u.color }));
     io.emit('online-users-list', onlineList);
@@ -61,7 +54,7 @@ io.on('connection', (socket) => {
             color: data.avatarColor || '#007bff',
             friends: []
         };
-        saveDb(); // Save to file
+        saveDb(); 
         socket.emit('auth-response', { success: true, message: 'Account registered! You can now log in.' });
     });
 
@@ -82,7 +75,7 @@ io.on('connection', (socket) => {
             friends: userRecord.friends
         });
 
-        broadcastOnlineUsers(); // Update online list for everyone
+        broadcastOnlineUsers(); 
     });
 
     socket.on('chat message', (data) => {
@@ -97,30 +90,43 @@ io.on('connection', (socket) => {
             time: timestamp
         };
 
-        // Broadcast to everyone
         io.emit('chat message', packet);
     });
 
+    // Friend System Logic
     socket.on('send-friend-request', (data) => {
         const sender = activeUsers[socket.id]?.username;
         const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === data.targetName);
-        if (targetSocketId && sender) io.to(targetSocketId).emit('incoming-friend-request', { from: sender });
+        if (targetSocketId && sender) {
+            io.to(targetSocketId).emit('incoming-friend-request', { from: sender });
+        }
     });
 
     socket.on('accept-friend-request', (data) => {
-        const sender = activeUsers[socket.id]?.username;
-        if (sender && dbUsers[sender] && !dbUsers[sender].friends.includes(data.targetName)) {
-            dbUsers[sender].friends.push(data.targetName);
+        const sender = activeUsers[socket.id]?.username; // The person who clicked "accept"
+        const targetName = data.targetName; // The person who sent the request
+
+        if (sender && dbUsers[sender] && !dbUsers[sender].friends.includes(targetName)) {
+            dbUsers[sender].friends.push(targetName);
         }
-        if (dbUsers[data.targetName] && !dbUsers[data.targetName].friends.includes(sender)) {
-            dbUsers[data.targetName].friends.push(sender);
+        if (dbUsers[targetName] && !dbUsers[targetName].friends.includes(sender)) {
+            dbUsers[targetName].friends.push(sender);
         }
-        saveDb(); // Save new friends to file
+        saveDb(); 
+        
+        // Update the person who clicked accept
+        socket.emit('friends-list-updated', dbUsers[sender].friends);
+
+        // Update the person who sent the request (if they are currently online)
+        const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === targetName);
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('friends-list-updated', dbUsers[targetName].friends);
+        }
     });
 
     socket.on('disconnect', () => {
         delete activeUsers[socket.id];
-        broadcastOnlineUsers(); // Update online list when someone leaves
+        broadcastOnlineUsers(); 
     });
 });
 

@@ -4,160 +4,226 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Chat App</title>
-    <script src="/socket.io/socket.io.js"></script>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --panel-bg: #ffffff;
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --border: #e5e7eb;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
-        body { background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
-
-        /* Login / Auth Screen */
-        #auth-screen {
-            background: var(--panel-bg); padding: 40px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center;
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        #auth-screen h2 { margin-bottom: 20px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.2s; }
-        .auth-btn:hover { background: var(--primary-hover); }
-        #auth-message { color: #dc2626; font-size: 0.9rem; margin-top: 10px; }
 
         /* Main App Container */
-        #app-container {
-            display: none; width: 95%; max-width: 1400px; height: 90vh;
-            background-color: var(--panel-bg); border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden;
-            display: flex; /* overridden by JS initially */
+        .app-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
-        /* Sidebars */
-        .sidebar { width: 280px; background-color: #f9fafb; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar.right { border-right: none; border-left: 1px solid var(--border); width: 250px; }
-        .sidebar-header { padding: 20px; font-weight: 600; border-bottom: 1px solid var(--border); background-color: var(--panel-bg); }
-        .list-container { overflow-y: auto; flex: 1; padding: 10px 0; }
+        /* Left Side: Contact List */
+        .sidebar {
+            width: 300px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .list-item { display: flex; align-items: center; padding: 12px 20px; transition: background 0.2s; }
-        .list-item:hover { background-color: #f3f4f6; }
-        
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #ccc; margin-right: 15px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem;}
+        .sidebar-header {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+        }
 
-        /* Chat Window */
-        .chat-window { flex: 1; display: flex; flex-direction: column; background-color: var(--panel-bg); }
-        .chat-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-weight: bold;}
-        
-        .chat-history { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .contact-list {
+            overflow-y: auto;
+        }
+
+        .contact {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .contact:hover, .contact.active {
+            background-color: #eaf3ff;
+        }
+
+        .contact-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-right: 15px;
+        }
+
+        /* Right Side: Chat Window */
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fefefe;
+        }
+
+        .chat-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        .chat-header .contact-avatar {
+            background-color: #007bff;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #f9fbfd;
+        }
 
         /* Message Bubbles */
-        .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
-        .message-wrapper.them { align-self: flex-start; }
-        .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
-        
-        .sender-name { font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; margin-left: 4px; margin-right: 4px;}
-        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .message-wrapper.them .bubble { background-color: #f3f4f6; color: var(--text-dark); border-bottom-left-radius: 4px; }
-        .message-wrapper.me .bubble { background-color: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.them {
+            justify-content: flex-start;
+        }
+
+        .message-row.me {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: 60%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message-row.them .bubble {
+            background-color: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-row.me .bubble {
+            background-color: #007bff;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
 
         /* Input Area */
-        .input-area { padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 15px; background: var(--panel-bg); }
-        .input-area input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 30px; outline: none; font-size: 1rem; background: #f9fafb; transition: 0.2s;}
-        .input-area input:focus { border-color: var(--primary); background: white;}
-        .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .send-btn:hover { background-color: var(--primary-hover); }
+        .input-area {
+            padding: 15px 20px;
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
 
-        /* Online indicator */
-        .online-dot { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; margin-left: auto; }
+        .input-area input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .input-area input:focus {
+            border-color: #007bff;
+        }
+
+        .send-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <h2>Welcome</h2>
-        <input type="text" id="username" class="auth-input" placeholder="Username" autocomplete="off">
-        <input type="password" id="password" class="auth-input" placeholder="Password">
-        <button class="auth-btn" onclick="login()">Login</button>
-        <button class="auth-btn" style="background: #6b7280;" onclick="register()">Register</button>
-        <div id="auth-message"></div>
-    </div>
-
-    <div id="app-container" style="display: none;">
-        
+    <div class="app-container">
+        <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-header">Global Chat</div>
-            <div class="list-container" id="channel-list">
-                <div class="list-item" style="background: #e0e7ff; border-right: 3px solid var(--primary);">
-                    <div class="avatar" style="background-color: var(--primary);">#</div>
-                    <div><strong>Global Lounge</strong></div>
+            <div class="sidebar-header">Messages</div>
+            <div class="contact-list">
+                <div class="contact active">
+                    <div class="contact-avatar" style="background-color: #007bff;"></div>
+                    <div>
+                        <strong>Alice</strong>
+                        <div style="font-size: 0.8rem; color: #666;">Hey, what's up?</div>
+                    </div>
+                </div>
+                <div class="contact">
+                    <div class="contact-avatar" style="background-color: #ffc107;"></div>
+                    <div>
+                        <strong>Bob</strong>
+                        <div style="font-size: 0.8rem; color: #666;">See you tomorrow!</div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Chat Window -->
         <div class="chat-window">
             <div class="chat-header">
-                <span id="current-room-name">Global Lounge</span>
-                <span id="my-profile-name" style="color: var(--text-light); font-size: 0.9rem;"></span>
+                <div class="contact-avatar" style="background-color: #007bff;"></div>
+                <h2>Alice</h2>
             </div>
             
             <div class="chat-history" id="chat-history">
+                <div class="message-row them">
+                    <div class="bubble">Hey! Did you finish that coding project?</div>
                 </div>
+                <div class="message-row me">
+                    <div class="bubble">Almost done! Just working on the UI now.</div>
+                </div>
+            </div>
 
             <div class="input-area">
-                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                <input type="text" id="message-input" placeholder="Type a message...">
                 <button class="send-btn" id="send-btn">Send</button>
             </div>
         </div>
-
-        <div class="sidebar right">
-            <div class="sidebar-header">Online Users</div>
-            <div class="list-container" id="online-users-list">
-                </div>
-        </div>
-
     </div>
 
     <script>
-        const socket = io();
-        let myUsername = "";
-
-        // --- AUTHENTICATION LOGIC ---
-        const authScreen = document.getElementById('auth-screen');
-        const appContainer = document.getElementById('app-container');
-        const authMsg = document.getElementById('auth-message');
-        const userInp = document.getElementById('username');
-        const passInp = document.getElementById('password');
-
-        function login() {
-            socket.emit('login-account', { username: userInp.value, password: passInp.value });
-        }
-
-        function register() {
-            // Generate a random color for the new user avatar
-            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-            socket.emit('register-account', { username: userInp.value, password: passInp.value, avatarColor: randomColor });
-        }
-
-        socket.on('auth-response', (res) => {
-            if (res.success && res.username) {
-                // Successful Login
-                myUsername = res.username;
-                authScreen.style.display = 'none';
-                appContainer.style.display = 'flex';
-                document.getElementById('my-profile-name').innerText = `Logged in as: ${myUsername}`;
-            } else {
-                // Registration success or any errors
-                authMsg.innerText = res.message;
-            }
-        });
-
-        // --- CHAT LOGIC ---
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
         const chatHistory = document.getElementById('chat-history');
@@ -165,49 +231,20 @@
         function sendMessage() {
             const text = messageInput.value.trim();
             if (text !== '') {
-                socket.emit('chat message', { text: text });
+                // Create your message bubble
+                const messageRow = document.createElement('div');
+                messageRow.className = 'message-row me';
+                messageRow.innerHTML = `<div class="bubble">${text}</div>`;
+                
+                chatHistory.appendChild(messageRow);
                 messageInput.value = '';
+                chatHistory.scrollTop = chatHistory.scrollHeight;
             }
         }
 
         sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
+        messageInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
-        });
-
-        socket.on('chat message', (data) => {
-            const isMe = data.username === myUsername;
-            const alignClass = isMe ? 'me' : 'them';
-            
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message-wrapper ${alignClass}`;
-            
-            // Get first letter of username for avatar if we wanted to show it in chat
-            msgDiv.innerHTML = `
-                ${!isMe ? `<div class="sender-name">${data.username} <span style="font-size:0.7rem;">${data.time}</span></div>` : ''}
-                <div class="bubble">${data.text}</div>
-            `;
-            
-            chatHistory.appendChild(msgDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        });
-
-        // --- ONLINE USERS LOGIC ---
-        const onlineUsersContainer = document.getElementById('online-users-list');
-
-        socket.on('online-users-list', (users) => {
-            onlineUsersContainer.innerHTML = ''; // Clear current list
-            users.forEach(user => {
-                const initial = user.username.charAt(0).toUpperCase();
-                const userDiv = document.createElement('div');
-                userDiv.className = 'list-item';
-                userDiv.innerHTML = `
-                    <div class="avatar" style="background-color: ${user.color};">${initial}</div>
-                    <div><strong>${user.username} ${user.username === myUsername ? '(You)' : ''}</strong></div>
-                    <div class="online-dot"></div>
-                `;
-                onlineUsersContainer.appendChild(userDiv);
-            });
         });
     </script>
 </body>

@@ -17,68 +17,57 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
         body { background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
 
-        /* Login / Auth Screen */
-        #auth-screen {
-            background: var(--panel-bg); padding: 40px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center;
-        }
+        /* Login Screen */
+        #auth-screen { background: var(--panel-bg); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
         #auth-screen h2 { margin-bottom: 20px; }
         .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
         .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: 0.2s; }
         .auth-btn:hover { background: var(--primary-hover); }
         #auth-message { color: #dc2626; font-size: 0.9rem; margin-top: 10px; }
 
-        /* Main App Container */
-        #app-container {
-            display: none; width: 95%; max-width: 1400px; height: 90vh;
-            background-color: var(--panel-bg); border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden;
-            display: flex; /* overridden by JS initially */
-        }
+        /* Main Container */
+        #app-container { display: none; width: 95%; max-width: 1400px; height: 90vh; background-color: var(--panel-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; display: flex; }
 
         /* Sidebars */
         .sidebar { width: 280px; background-color: #f9fafb; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar.right { border-right: none; border-left: 1px solid var(--border); width: 250px; }
+        .sidebar.right { border-right: none; border-left: 1px solid var(--border); width: 260px; }
         .sidebar-header { padding: 20px; font-weight: 600; border-bottom: 1px solid var(--border); background-color: var(--panel-bg); }
         .list-container { overflow-y: auto; flex: 1; padding: 10px 0; }
-
         .list-item { display: flex; align-items: center; padding: 12px 20px; transition: background 0.2s; }
         .list-item:hover { background-color: #f3f4f6; }
-        
         .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #ccc; margin-right: 15px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem;}
 
         /* Chat Window */
         .chat-window { flex: 1; display: flex; flex-direction: column; background-color: var(--panel-bg); }
         .chat-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-weight: bold;}
-        
         .chat-history { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Message Bubbles */
+        /* Messages */
         .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
         .message-wrapper.them { align-self: flex-start; }
         .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
-        
         .sender-name { font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; margin-left: 4px; margin-right: 4px;}
         .bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .message-wrapper.them .bubble { background-color: #f3f4f6; color: var(--text-dark); border-bottom-left-radius: 4px; }
         .message-wrapper.me .bubble { background-color: var(--primary); color: white; border-bottom-right-radius: 4px; }
 
-        /* Input Area */
+        /* Inputs & Buttons */
         .input-area { padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 15px; background: var(--panel-bg); }
         .input-area input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 30px; outline: none; font-size: 1rem; background: #f9fafb; transition: 0.2s;}
         .input-area input:focus { border-color: var(--primary); background: white;}
         .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 25px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .send-btn:hover { background-color: var(--primary-hover); }
 
-        /* Online indicator */
+        .add-friend-btn { background: var(--primary); color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: bold; margin-left: auto; transition: 0.2s;}
+        .add-friend-btn:hover { background: var(--primary-hover); }
         .online-dot { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; margin-left: auto; }
     </style>
 </head>
 <body>
 
+    <!-- Login -->
     <div id="auth-screen">
         <h2>Welcome</h2>
         <input type="text" id="username" class="auth-input" placeholder="Username" autocomplete="off">
@@ -88,26 +77,33 @@
         <div id="auth-message"></div>
     </div>
 
+    <!-- App -->
     <div id="app-container" style="display: none;">
         
+        <!-- Left Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">Global Chat</div>
-            <div class="list-container" id="channel-list">
+            <div class="list-container" style="flex: 0; padding-bottom: 0;">
                 <div class="list-item" style="background: #e0e7ff; border-right: 3px solid var(--primary);">
                     <div class="avatar" style="background-color: var(--primary);">#</div>
                     <div><strong>Global Lounge</strong></div>
                 </div>
             </div>
+
+            <div class="sidebar-header" style="border-top: 1px solid var(--border); margin-top: 10px;">Friends List</div>
+            <div class="list-container" id="friend-list">
+                <!-- Friends will populate here -->
+            </div>
         </div>
 
+        <!-- Chat Window -->
         <div class="chat-window">
             <div class="chat-header">
                 <span id="current-room-name">Global Lounge</span>
                 <span id="my-profile-name" style="color: var(--text-light); font-size: 0.9rem;"></span>
             </div>
             
-            <div class="chat-history" id="chat-history">
-                </div>
+            <div class="chat-history" id="chat-history"></div>
 
             <div class="input-area">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
@@ -115,10 +111,10 @@
             </div>
         </div>
 
+        <!-- Right Sidebar -->
         <div class="sidebar right">
             <div class="sidebar-header">Online Users</div>
-            <div class="list-container" id="online-users-list">
-                </div>
+            <div class="list-container" id="online-users-list"></div>
         </div>
 
     </div>
@@ -126,40 +122,36 @@
     <script>
         const socket = io();
         let myUsername = "";
+        let myFriends = [];
+        let currentOnlineUsers = [];
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTH ---
         const authScreen = document.getElementById('auth-screen');
         const appContainer = document.getElementById('app-container');
-        const authMsg = document.getElementById('auth-message');
-        const userInp = document.getElementById('username');
-        const passInp = document.getElementById('password');
-
-        function login() {
-            socket.emit('login-account', { username: userInp.value, password: passInp.value });
-        }
-
+        
+        function login() { socket.emit('login-account', { username: document.getElementById('username').value, password: document.getElementById('password').value }); }
         function register() {
-            // Generate a random color for the new user avatar
             const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-            socket.emit('register-account', { username: userInp.value, password: passInp.value, avatarColor: randomColor });
+            socket.emit('register-account', { username: document.getElementById('username').value, password: document.getElementById('password').value, avatarColor: randomColor });
         }
 
         socket.on('auth-response', (res) => {
             if (res.success && res.username) {
-                // Successful Login
                 myUsername = res.username;
+                myFriends = res.friends || [];
+                
+                renderFriendsList();
+                
                 authScreen.style.display = 'none';
                 appContainer.style.display = 'flex';
                 document.getElementById('my-profile-name').innerText = `Logged in as: ${myUsername}`;
             } else {
-                // Registration success or any errors
-                authMsg.innerText = res.message;
+                document.getElementById('auth-message').innerText = res.message;
             }
         });
 
-        // --- CHAT LOGIC ---
+        // --- CHAT ---
         const messageInput = document.getElementById('message-input');
-        const sendBtn = document.getElementById('send-btn');
         const chatHistory = document.getElementById('chat-history');
 
         function sendMessage() {
@@ -170,45 +162,86 @@
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
         socket.on('chat message', (data) => {
             const isMe = data.username === myUsername;
-            const alignClass = isMe ? 'me' : 'them';
-            
             const msgDiv = document.createElement('div');
-            msgDiv.className = `message-wrapper ${alignClass}`;
-            
-            // Get first letter of username for avatar if we wanted to show it in chat
+            msgDiv.className = `message-wrapper ${isMe ? 'me' : 'them'}`;
             msgDiv.innerHTML = `
                 ${!isMe ? `<div class="sender-name">${data.username} <span style="font-size:0.7rem;">${data.time}</span></div>` : ''}
                 <div class="bubble">${data.text}</div>
             `;
-            
             chatHistory.appendChild(msgDiv);
             chatHistory.scrollTop = chatHistory.scrollHeight;
         });
 
-        // --- ONLINE USERS LOGIC ---
-        const onlineUsersContainer = document.getElementById('online-users-list');
+        // --- FRIENDS & ONLINE USERS ---
+        function sendFriendRequest(targetName) {
+            socket.emit('send-friend-request', { targetName });
+            alert(`Friend request sent to ${targetName}!`);
+        }
+
+        socket.on('incoming-friend-request', (data) => {
+            if(confirm(`${data.from} sent you a friend request! Do you want to accept?`)) {
+                socket.emit('accept-friend-request', { targetName: data.from });
+            }
+        });
+
+        socket.on('friends-list-updated', (friends) => {
+            myFriends = friends;
+            renderFriendsList();
+            renderOnlineUsers(); // Re-render to hide '+' buttons for new friends
+        });
+
+        function renderFriendsList() {
+            const friendContainer = document.getElementById('friend-list');
+            friendContainer.innerHTML = '';
+            myFriends.forEach(friend => {
+                const initial = friend.charAt(0).toUpperCase();
+                friendContainer.innerHTML += `
+                    <div class="list-item">
+                        <div class="avatar" style="background-color: #10b981;">${initial}</div>
+                        <div><strong>${friend}</strong></div>
+                    </div>
+                `;
+            });
+        }
 
         socket.on('online-users-list', (users) => {
-            onlineUsersContainer.innerHTML = ''; // Clear current list
-            users.forEach(user => {
+            currentOnlineUsers = users;
+            renderOnlineUsers();
+        });
+
+        function renderOnlineUsers() {
+            const container = document.getElementById('online-users-list');
+            container.innerHTML = ''; 
+            
+            currentOnlineUsers.forEach(user => {
                 const initial = user.username.charAt(0).toUpperCase();
+                const isMe = user.username === myUsername;
+                const isFriend = myFriends.includes(user.username);
+                
+                let actionBtn = '';
+                let onlineDotStyle = '';
+                
+                if (!isMe && !isFriend) {
+                    actionBtn = `<button class="add-friend-btn" onclick="sendFriendRequest('${user.username}')">+ Add</button>`;
+                    onlineDotStyle = 'margin-left: 10px;'; // push dot over if button is there
+                }
+
                 const userDiv = document.createElement('div');
                 userDiv.className = 'list-item';
                 userDiv.innerHTML = `
                     <div class="avatar" style="background-color: ${user.color};">${initial}</div>
-                    <div><strong>${user.username} ${user.username === myUsername ? '(You)' : ''}</strong></div>
-                    <div class="online-dot"></div>
+                    <div style="flex: 1;"><strong>${user.username} ${isMe ? '(You)' : ''}</strong></div>
+                    ${actionBtn}
+                    <div class="online-dot" style="${onlineDotStyle}"></div>
                 `;
-                onlineUsersContainer.appendChild(userDiv);
+                container.appendChild(userDiv);
             });
-        });
+        }
     </script>
 </body>
 </html>
