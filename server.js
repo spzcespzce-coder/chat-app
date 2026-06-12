@@ -2,21 +2,39 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    maxHttpBufferSize: 1e7 // Up to 10MB for avatar images
+    maxHttpBufferSize: 1e7
 });
 
+// Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Persistent server-side account database
-const dbUsers = {}; 
-let activeServers = ['global-lounge', 'coding-zone', 'chatgpt-bot'];
-const activeUsers = {};
+// Persistent Database using a JSON file
+const DB_FILE = 'users.json';
+let dbUsers = {};
 
-const BANNED_WORDS = ['swear1', 'swear2', 'badword', 'ass', 'bitch', 'fuck']; 
+// Load existing users if the file exists
+if (fs.existsSync(DB_FILE)) {
+    try {
+        dbUsers = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    } catch (e) {
+        console.error("Error reading database:", e);
+    }
+}
+
+// Function to save to database
+function saveDb() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbUsers, null, 2));
+}
+
+let activeServers = ['global-lounge', 'coding-zone', 'chatgpt-bot'];
+const activeUsers = {}; // Tracks currently online users
+
+const BANNED_WORDS = ['swear1', 'swear2', 'badword']; 
 function moderateText(text) {
     let moderated = text;
     BANNED_WORDS.forEach(word => {
@@ -26,21 +44,10 @@ function moderateText(text) {
     return moderated;
 }
 
-async function askActualAI(userPrompt) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return "🤖 Connect your GEMINI_API_KEY in Render settings to wake up my AI brain!";
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
-        });
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error("AI Error:", error);
-        return "🤖 Oops! My neural network hit a bump.";
-    }
+// Broadcasts the current online users to everyone
+function broadcastOnlineUsers() {
+    const onlineList = Object.values(activeUsers).map(u => ({ username: u.username, color: u.color }));
+    io.emit('online-users-list', onlineList);
 }
 
 io.on('connection', (socket) => {
@@ -51,11 +58,11 @@ io.on('connection', (socket) => {
 
         dbUsers[usernameTrim] = {
             password: data.password, 
-            color: data.avatarColor,
-            avatarImage: data.avatarImage || null,
+            color: data.avatarColor || '#007bff',
             friends: []
         };
-        socket.emit('auth-response', { success: true, message: 'Account registered! Logging you in...' });
+        saveDb(); // Save to file
+        socket.emit('auth-response', { success: true, message: 'Account registered! You can now log in.' });
     });
 
     socket.on('login-account', (data) => {
@@ -66,65 +73,32 @@ io.on('connection', (socket) => {
             return socket.emit('auth-response', { success: false, message: 'Invalid username or password.' });
         }
 
-        activeUsers[socket.id] = { username: usernameTrim, color: userRecord.color, avatarImage: userRecord.avatarImage };
+        activeUsers[socket.id] = { username: usernameTrim, color: userRecord.color };
 
         socket.emit('auth-response', { 
-            success: true, username: usernameTrim, 
-            avatarColor: userRecord.color, avatarImage: userRecord.avatarImage,
-            servers: activeServers, friends: userRecord.friends
+            success: true, 
+            username: usernameTrim, 
+            avatarColor: userRecord.color,
+            friends: userRecord.friends
         });
+
+        broadcastOnlineUsers(); // Update online list for everyone
     });
 
-    socket.on('create-server', (serverName) => {
-        const cleanName = serverName.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-');
-        if (cleanName && !activeServers.includes(cleanName)) {
-            activeServers.push(cleanName);
-            io.emit('server-list-updated', activeServers);
-        }
-    });
-
-    socket.on('update-profile-settings', (data) => {
-        const activeSession = activeUsers[socket.id];
-        if (activeSession && dbUsers[activeSession.username]) {
-            if (data.color) {
-                dbUsers[activeSession.username].color = data.color;
-                activeSession.color = data.color;
-            }
-            if (data.avatarImage) {
-                dbUsers[activeSession.username].avatarImage = data.avatarImage;
-                activeSession.avatarImage = data.avatarImage;
-            }
-            socket.emit('profile-settings-updated', { color: activeSession.color, avatarImage: activeSession.avatarImage });
-        }
-    });
-
-    socket.on('chat message', async (data) => {
+    socket.on('chat message', (data) => {
         const cleanText = moderateText(data.text);
         const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const senderSession = activeUsers[socket.id] || {};
         
         const packet = {
-            text: cleanText, username: data.username, 
-            avatarColor: senderSession.color || data.avatarColor,
-            avatarImage: senderSession.avatarImage || null,
-            room: data.room, time: timestamp
+            text: cleanText, 
+            username: senderSession.username || 'Anonymous', 
+            avatarColor: senderSession.color || '#ccc',
+            time: timestamp
         };
 
-        if (data.room === 'chatgpt-bot') {
-            const aiResponse = await askActualAI(data.text);
-            socket.emit('chat message', {
-                text: aiResponse, username: "ChatGPT", avatarColor: "#10b981", avatarImage: null,
-                room: 'chatgpt-bot', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-        } else if (data.room.startsWith('dm-')) {
-            const targetName = data.room.split('-')[1];
-            const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === targetName);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit('chat message', { ...packet, room: `dm-${data.username}` });
-            }
-        } else {
-            socket.broadcast.emit('chat message', packet);
-        }
+        // Broadcast to everyone
+        io.emit('chat message', packet);
     });
 
     socket.on('send-friend-request', (data) => {
@@ -135,15 +109,19 @@ io.on('connection', (socket) => {
 
     socket.on('accept-friend-request', (data) => {
         const sender = activeUsers[socket.id]?.username;
-        const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === data.targetName);
-
-        if (sender && dbUsers[sender] && !dbUsers[sender].friends.includes(data.targetName)) dbUsers[sender].friends.push(data.targetName);
-        if (dbUsers[data.targetName] && !dbUsers[data.targetName].friends.includes(sender)) dbUsers[data.targetName].friends.push(sender);
-
-        if (targetSocketId && sender) io.to(targetSocketId).emit('friend-request-accepted', { from: sender });
+        if (sender && dbUsers[sender] && !dbUsers[sender].friends.includes(data.targetName)) {
+            dbUsers[sender].friends.push(data.targetName);
+        }
+        if (dbUsers[data.targetName] && !dbUsers[data.targetName].friends.includes(sender)) {
+            dbUsers[data.targetName].friends.push(sender);
+        }
+        saveDb(); // Save new friends to file
     });
 
-    socket.on('disconnect', () => delete activeUsers[socket.id]);
+    socket.on('disconnect', () => {
+        delete activeUsers[socket.id];
+        broadcastOnlineUsers(); // Update online list when someone leaves
+    });
 });
 
 const PORT = process.env.PORT || 3000;
