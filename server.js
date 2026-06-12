@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
 
         dbUsers[usernameTrim] = {
             password: data.password, 
-            color: data.avatarColor || '#4f46e5',
+            color: data.avatarColor || '#6366f1',
             avatarImage: data.avatarImage || null,
             friends: []
         };
@@ -164,25 +164,34 @@ io.on('connection', (socket) => {
         }
     });
 
-    // SIMPLIFIED INSTANT FRIEND SYSTEM
+    // ROBUST SEARCH & INSTANT ADD CONTROLLER
     socket.on('add-friend-instant', (data) => {
         const sender = activeUsers[socket.id]?.username;
-        const targetName = data.targetName;
+        const targetName = data.targetName ? data.targetName.trim() : "";
 
-        if (!sender || !dbUsers[sender] || !dbUsers[targetName] || sender === targetName) return;
-
-        // Seamlessly add each other to respective lists
-        if (!dbUsers[sender].friends.includes(targetName)) {
-            dbUsers[sender].friends.push(targetName);
-        }
-        if (!dbUsers[targetName].friends.includes(sender)) {
-            dbUsers[targetName].friends.push(sender);
-        }
+        if (!sender || !dbUsers[sender]) return;
         
+        if (!targetName) {
+            return socket.emit('search-error', 'Please enter a username.');
+        }
+        if (sender.toLowerCase() === targetName.toLowerCase()) {
+            return socket.emit('search-error', 'You cannot add yourself!');
+        }
+        if (!dbUsers[targetName]) {
+            return socket.emit('search-error', `User "${targetName}" does not exist.`);
+        }
+        if (dbUsers[sender].friends.includes(targetName)) {
+            return socket.emit('search-error', `${targetName} is already your friend.`);
+        }
+
+        // Link profiles together securely
+        dbUsers[sender].friends.push(targetName);
+        dbUsers[targetName].friends.push(sender);
         saveDatabase();
 
-        // Push new friend list values down instantly
+        // Push updates live
         socket.emit('friend-list-updated', dbUsers[sender].friends);
+        socket.emit('search-success', `Successfully added ${targetName}!`);
         
         const targetSocketId = Object.keys(activeUsers).find(id => activeUsers[id].username === targetName);
         if (targetSocketId) {

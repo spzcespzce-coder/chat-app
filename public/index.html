@@ -3,92 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern App Platform</title>
+    <title>Modern App Platform - Dark Edition</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-main: #f3f4f6;
-            --panel-bg: #ffffff;
-            --sidebar-bg: #f9fafb;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-main: #0f172a;      /* Deep Slate Background */
+            --panel-bg: #1e293b;     /* Module Background */
+            --sidebar-bg: #0b0f19;   /* Sidebar Contrast */
+            --text-dark: #f3f4f6;    /* Bright Readable Text */
+            --text-muted: #9ca3af;   /* Muted Grey Labels */
+            --border: #334155;       /* Subdued Border Lines */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-main); display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text-dark); }
 
+        /* Authentication overlay box container */
         #auth-overlay { position: fixed; inset: 0; background: var(--bg-main); display: flex; justify-content: center; align-items: center; z-index: 999; }
-        .auth-card { background: var(--panel-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 360px; text-align: center; }
-        .auth-card h2 { margin-bottom: 24px; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.5px; }
-        .auth-field { width: 100%; padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; }
+        .auth-card { background: var(--panel-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 360px; text-align: center; border: 1px solid var(--border); }
+        .auth-card h2 { margin-bottom: 24px; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.5px; color: var(--text-dark); }
+        .auth-field { width: 100%; padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--border); background-color: #0f172a; color: white; border-radius: 8px; outline: none; font-size: 0.95rem; }
         .auth-field:focus { border-color: var(--primary); }
         .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; transition: 0.2s; }
         .auth-btn:hover { background: var(--primary-hover); }
-        #auth-log { color: #ef4444; font-size: 0.85rem; margin-top: 8px; min-height: 18px; }
+        #auth-log { color: #f87171; font-size: 0.85rem; margin-top: 8px; min-height: 18px; }
 
-        .app-container { display: none; width: 95vw; max-width: 1440px; height: 90vh; background-color: var(--panel-bg); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid var(--border); }
+        /* App Platform Workspace Frame */
+        .app-container { display: none; width: 95vw; max-width: 1440px; height: 90vh; background-color: var(--panel-bg); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); overflow: hidden; border: 1px solid var(--border); }
 
-        .left-sidebar { width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        /* Left Sidebar Management columns Layout rules */
+        .left-sidebar { width: 290px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar-section { display: flex; flex-direction: column; overflow: hidden; }
-        .section-scroll { overflow-y: auto; max-height: 220px; padding: 4px 0; }
+        .section-scroll { overflow-y: auto; max-height: 180px; padding: 4px 0; }
         .panel-heading { padding: 16px 20px 8px 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .add-action-icon { cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
         .add-action-icon:hover { color: var(--primary); }
 
-        .row-item { display: flex; align-items: center; padding: 10px 20px; cursor: pointer; transition: background 0.2s; position: relative; gap: 12px; font-weight: 500; font-size: 0.95rem; }
-        .row-item:hover { background-color: #f3f4f6; }
-        .row-item.active { background-color: #e0e7ff; color: var(--primary); font-weight: 600; }
+        /* Search input UI container spacing elements configuration rules */
+        .search-box-container { padding: 4px 20px 12px 20px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); }
+        .search-input { flex: 1; padding: 8px 14px; background: #1e293b; border: 1px solid var(--border); border-radius: 6px; color: white; font-size: 0.85rem; outline: none; }
+        .search-input:focus { border-color: var(--primary); }
+        .search-btn { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .search-btn:hover { background: var(--primary-hover); }
+
+        /* Core Dynamic Rows configuration */
+        .row-item { display: flex; align-items: center; padding: 10px 20px; cursor: pointer; transition: background 0.2s; position: relative; gap: 12px; font-weight: 500; font-size: 0.95rem; color: #cbd5e1; }
+        .row-item:hover { background-color: #1e293b; }
+        .row-item.active { background-color: #312e81; color: #e0e7ff; font-weight: 600; border-left: 3px solid var(--primary); }
         
-        .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background-color: #dbeafe; color: var(--primary); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; background-size: cover; background-position: center; text-transform: uppercase; }
+        .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background-color: #334155; color: #6366f1; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; text-transform: uppercase; }
 
+        /* Centralized communication stream display workspace */
         .chat-window { flex: 1; display: flex; flex-direction: column; background-color: var(--panel-bg); }
-        .chat-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .chat-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background-color: #111827; }
         .chat-header h2 { font-size: 1.15rem; font-weight: 700; }
-        .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background-color: #fafafa; }
+        .chat-history { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background-color: #0f172a; }
 
+        /* Dynamic message cloud structure rulesets formatting rules */
         .msg-row { display: flex; flex-direction: column; max-width: 65%; width: fit-content; }
         .msg-row.them { align-self: flex-start; }
         .msg-row.me { align-self: flex-end; align-items: flex-end; }
         .msg-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; display: flex; gap: 6px; }
-        .msg-cloud { padding: 10px 16px; border-radius: 16px; font-size: 0.95rem; line-height: 1.45; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .msg-row.them .msg-cloud { background-color: #e5e7eb; color: var(--text-dark); border-top-left-radius: 4px; }
+        .msg-cloud { padding: 10px 16px; border-radius: 16px; font-size: 0.95rem; line-height: 1.45; word-break: break-word; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .msg-row.them .msg-cloud { background-color: #334155; color: #f8fafc; border-top-left-radius: 4px; }
         .msg-row.me .msg-cloud { background-color: var(--primary); color: #ffffff; border-top-right-radius: 4px; }
 
-        .input-area { padding: 16px 24px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; gap: 12px; align-items: center; }
-        .input-area input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 24px; outline: none; font-size: 0.95rem; background-color: #f9fafb; transition: 0.2s; }
-        .input-area input:focus { border-color: var(--primary); background-color: white; }
+        .input-area { padding: 16px 24px; border-top: 1px solid var(--border); background-color: #111827; display: flex; gap: 12px; align-items: center; }
+        .input-area input { flex: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 24px; outline: none; font-size: 0.95rem; background-color: #1e293b; color: white; transition: 0.2s; }
+        .input-area input:focus { border-color: var(--primary); background-color: #0f172a; }
         .send-btn { background-color: var(--primary); color: white; border: none; border-radius: 24px; padding: 0 22px; font-weight: 600; height: 42px; cursor: pointer; transition: 0.2s; }
         .send-btn:hover { background-color: var(--primary-hover); }
 
-        .profile-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); background-color: var(--panel-bg); display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .profile-footer:hover { background-color: #f9fafb; }
+        .profile-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); background-color: #0b0f19; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .profile-footer:hover { background-color: #111827; }
         .user-details { display: flex; flex-direction: column; overflow: hidden; }
         .user-name-tag { font-size: 0.9rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         .user-status-text { font-size: 0.75rem; color: var(--text-muted); }
 
+        /* Right Hand Online Status Side panel tracker column style rules */
         .right-sidebar { width: 260px; background-color: var(--sidebar-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .online-scroll { overflow-y: auto; flex: 1; padding: 4px 0; }
-        .online-badge-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
-        .action-add-friend { font-size: 0.75rem; background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: auto; transition: 0.2s; }
-        .action-add-friend:hover { background: var(--primary-hover); }
+        .online-badge-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-left: auto; flex-shrink: 0; box-shadow: 0 0 8px #10b981; }
     </style>
 </head>
 <body>
 
+    <!-- Shield overlay system access validation login screen layout window view plate component -->
     <div id="auth-overlay">
         <div class="auth-card">
             <h2>Welcome Back</h2>
             <input type="text" id="auth-user" class="auth-field" placeholder="Username" autocomplete="off">
             <input type="password" id="auth-pass" class="auth-field" placeholder="Password">
             <button class="auth-btn" onclick="submitLogin()">Log In</button>
-            <button class="auth-btn" style="background-color: var(--text-muted);" onclick="submitRegister()">Create Account</button>
+            <button class="auth-btn" style="background-color: #475569;" onclick="submitRegister()">Create Account</button>
             <div id="auth-log"></div>
         </div>
     </div>
 
+    <!-- Active running application display panel setup module container grid system context layout wrapper box -->
     <div class="app-container" id="app-workspace">
         <div class="left-sidebar">
             <div class="sidebar-section">
@@ -101,14 +115,21 @@
 
             <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; margin-top: 10px;">
                 <div class="panel-heading">Direct Messages</div>
+                
+                <!-- SEARCH INPUT ENGINE GRAPHICS INTERFACE MODULE COMPONENT LAYER -->
+                <div class="search-box-container">
+                    <input type="text" id="dom-friend-search-field" class="search-input" placeholder="Search user to add..." autocomplete="off">
+                    <button class="search-btn" onclick="executeSearchAndAdd()">Add</button>
+                </div>
+
                 <div class="section-scroll" style="flex: 1; max-height: none;" id="dom-friends-box"></div>
             </div>
 
             <div class="profile-footer" onclick="triggerProfileCustomization()">
-                <div class="avatar-circle" id="my-footer-avatar">?</div>
+                <div class="avatar-circle" id="my-footer-avatar" style="color: white;">?</div>
                 <div class="user-details">
                     <span class="user-name-tag" id="my-footer-name">Guest Identity</span>
-                    <span class="user-status-text">Online Profile (Edit)</span>
+                    <span class="user-status-text">Online Profile (Edit Color)</span>
                 </div>
             </div>
         </div>
@@ -127,6 +148,7 @@
             </div>
         </div>
 
+        <!-- RIGHT SIDEBAR: CURRENTLY ONLINE ACTIVE USER ROSTER SYSTEM TRACK COMPONENT DISPLAY -->
         <div class="right-sidebar">
             <div class="panel-heading">Active Roster</div>
             <div class="online-scroll" id="dom-online-box"></div>
@@ -136,8 +158,7 @@
     <script>
         const socket = io();
         let clientUser = "";
-        let clientColor = "#4f46e5";
-        let clientImage = null;
+        let clientColor = "#6366f1";
         
         let clientRoomsList = [];
         let clientFriendsCollection = [];
@@ -163,7 +184,6 @@
                 logBox.innerText = "";
                 clientUser = res.username || document.getElementById('auth-user').value.trim();
                 clientColor = res.avatarColor || clientColor;
-                clientImage = res.avatarImage || null;
                 
                 clientRoomsList = res.servers || ['global-lounge', 'coding-zone', 'chatgpt-bot'];
                 clientFriendsCollection = res.friends || [];
@@ -216,20 +236,30 @@
                 const item = document.createElement('div');
                 item.className = `row-item ${isActive ? 'active' : ''}`;
                 item.onclick = () => changeTargetRoomState(srv, false);
-                item.innerHTML = `<div class="avatar-circle" style="background-color:${isActive ? 'var(--primary)':'#e5e7eb'}; color:${isActive?'white':'#4b5563'}">#</div><div>${srv}</div>`;
+                item.innerHTML = `<div class="avatar-circle" style="background-color:${isActive ? 'var(--primary)':'#334155'}; color:white">#</div><div>${srv}</div>`;
                 container.appendChild(item);
             });
         }
 
-        // SIMPLIFIED INSTANT ADD SCRIPT EXECUTION
-        function addFriendInstant(targetName) {
+        // --- SEARCH ENGINE INTERACTION GRAPHICS SCRIPT ACTIONS ---
+        function executeSearchAndAdd() {
+            const searchField = document.getElementById('dom-friend-search-field');
+            const targetName = searchField.value.trim();
             socket.emit('add-friend-instant', { targetName });
+            searchField.value = "";
         }
+
+        // Catch search entries via standard pressing of the Enter shortcut key
+        document.getElementById('dom-friend-search-field').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') executeSearchAndAdd();
+        });
+
+        socket.on('search-error', (msg) => alert(msg));
+        socket.on('search-success', (msg) => alert(msg));
 
         socket.on('friend-list-updated', (updatedFriends) => {
             clientFriendsCollection = updatedFriends;
             refreshFriendsLayoutBox();
-            // Re-fetch online layout roster states seamlessly
             socket.emit('login-account', { username: clientUser, password: document.getElementById('auth-pass').value });
         });
 
@@ -237,7 +267,7 @@
             const container = document.getElementById('dom-friends-box');
             container.innerHTML = "";
             if(clientFriendsCollection.length === 0) {
-                container.innerHTML = `<div style="padding: 10px 20px; font-size:0.85rem; color:var(--text-muted); font-style:italic;">No friends yet. Add users via Active Roster.</div>`;
+                container.innerHTML = `<div style="padding: 10px 20px; font-size:0.85rem; color:var(--text-muted); font-style:italic;">No friends yet. Enter a username above to search and add.</div>`;
                 return;
             }
             clientFriendsCollection.forEach(frn => {
@@ -251,27 +281,21 @@
             });
         }
 
+        // --- ONLINE ROSTER DISPLAY RENDERING (RIGHT SIDEBAR) ---
         socket.on('online-roster-updated', (roster) => {
             const container = document.getElementById('dom-online-box');
             container.innerHTML = "";
 
             roster.forEach(usr => {
                 const isSelf = (usr.username === clientUser);
-                const isAlreadyFriend = clientFriendsCollection.includes(usr.username);
-
                 const item = document.createElement('div');
                 item.className = 'row-item';
                 item.style.cursor = 'default';
 
-                let actionElement = `<div class="online-badge-dot"></div>`;
-                if(!isSelf && !isAlreadyFriend) {
-                    actionElement = `<button class="action-add-friend" onclick="addFriendInstant('${usr.username}')">+</button>`;
-                }
-
                 item.innerHTML = `
-                    <div class="avatar-circle" style="background-color:${usr.color};">${usr.username.charAt(0)}</div>
-                    <div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:120px;">${usr.username} ${isSelf ? '(You)':''}</div>
-                    ${actionElement}
+                    <div class="avatar-circle" style="background-color:${usr.color}; color:white;">${usr.username.charAt(0)}</div>
+                    <div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:140px;">${usr.username} ${isSelf ? '(You)':''}</div>
+                    <div class="online-badge-dot"></div>
                 `;
                 container.appendChild(item);
             });
@@ -304,7 +328,7 @@
 
             row.innerHTML = `
                 <div class="msg-meta">
-                    <span style="font-weight:700;">${data.username}</span>
+                    <span style="font-weight:700; color: #f1f5f9;">${data.username}</span>
                     <span>${data.time}</span>
                 </div>
                 <div class="msg-cloud">${data.text}</div>
